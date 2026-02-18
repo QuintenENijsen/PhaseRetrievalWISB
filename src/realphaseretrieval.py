@@ -31,8 +31,6 @@ def generate_gaussian_vector() -> npt.NDArray[np.float32]:
 def generate_measurement_matrix() -> npt.NDArray[np.float32]:
     return np.array([generate_gaussian_vector() for x in range(1, m)])
 
-def generate_measurement(matrix: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
-    pass
 
 def calculate_measurement(matrix: npt.NDArray[np.float32], row: int, f: npt.NDArray[np.float32]) -> float:
     if row > m:
@@ -41,7 +39,23 @@ def calculate_measurement(matrix: npt.NDArray[np.float32], row: int, f: npt.NDAr
         a_row = matrix[row]
         return abs(np.inner(a_row, f)) ** 2
 
-def find_minimizer(A: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+def generate_measured(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+    """Generates the y in the poisson phase retrieval problem, using the matrix A and assuming \mathcal{A} = |Af|^2"""
+    y = []
+
+    for i in range (1, m):
+        y.append(np.random.poisson(calculate_measurement(matrix, i, f0)))
+
+    return np.array(y)
+
+def find_minimizer(A: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+    """
+    Performs the wirtinger flow algorithm to reconstruct the ground truth signal. Assumes the Poisson MLE formulation of the phase retrieval problem.
+    :param A: The measurement matrix A, with \mathcal{A}(f) = |Af|^2 the measurement map
+    :param f0: The ground truth signal
+    :param y: The intensity measurement of our signal f_0. y_i distributed Pois(|<a_i, f_0>|^2)
+    :return:
+    """
     pass
 
 def calculate_reconstruction_error(f: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> float:
