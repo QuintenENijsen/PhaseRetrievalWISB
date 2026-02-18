@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Set-up to calculate all relevent details, no Wirtinger flow.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Final before Wirtinger Flow.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
@@ -82,13 +82,22 @@
       <option name="project" value="LOCAL" />
       <updated>1771434075952</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Final before Wirtinger Flow.">
+      <option name="closed" value="true" />
+      <created>1771435247415</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771435247415</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Set-up to calculate all relevent details, no Wirtinger flow." />
-    <option name="LAST_COMMIT_MESSAGE" value="Set-up to calculate all relevent details, no Wirtinger flow." />
+    <MESSAGE value="Final before Wirtinger Flow." />
+    <option name="LAST_COMMIT_MESSAGE" value="Final before Wirtinger Flow." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

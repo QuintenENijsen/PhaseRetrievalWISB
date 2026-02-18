@@ -56,6 +56,7 @@ def find_minimizer(A: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], y: n
     :param y: The intensity measurement of our signal f_0. y_i distributed Pois(|<a_i, f_0>|^2)
     :return:
     """
+
     pass
 
 def calculate_reconstruction_error(f: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> float:
