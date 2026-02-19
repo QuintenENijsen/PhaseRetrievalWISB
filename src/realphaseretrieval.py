@@ -1,6 +1,7 @@
 import sys
 
 import numpy as np
+from numpy import linalg as la
 import numpy.typing as npt
 import random as rand
 import math
@@ -13,6 +14,8 @@ SEED_MEASUREMENT_MAP = ""
 n: int = 20
 #Dimension of measurement
 m: int = n
+#Stopping condition wirtinger flow
+eps = 1e-06
 
 def vector_norm(f: npt.NDArray[np.float32]) -> float:
     return math.sqrt(np.sum(np.square(f)))
@@ -48,7 +51,34 @@ def generate_measured(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float3
 
     return np.array(y)
 
-def find_minimizer(A: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+def spectral_initialization(y: npt.NDArray[np.float32], A: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+    """
+    Performs initialization based on the spectral initialization method as defined in Candès, et al. (2015)
+    :param y: The measurements
+    :param A: The measurement matrix
+    :return: The Eigenvector of the largest Eigenvalue of 1/m \sum_{i=1}^m y_i a_i a_i^t
+    """
+    #Calculate the matrix 1/m \sum_{i=1}^m y_i a_i a_i^t
+    Y: npt.NDArray[np.float32] = np.zeros((n, n), dtype=np.float32)
+
+    for i in range (1, n):
+        Y = Y + y[i] * (np.outer(A[i], A[i]))
+
+    Y = 1/m * Y
+    #Get the eigenvector
+    eigenvalues, eigenvectors = la.eig(Y)
+    max_index = np.argmax(eigenvalues)
+
+    return eigenvectors[max_index]
+
+def compute_wirtinger_gradient(f: npt.NDArray[np.float32], A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+    inner_products = A @ f
+    intensities = inner_products ** 2
+    weights = 1.0 - y / (intensities + 1e-10) # + 1e-10 to not get division by zero errors whenever there are zero intensity measurements.
+    weighted = weights * inner_products
+    return A.T @ weighted
+
+def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
     """
     Performs the wirtinger flow algorithm to reconstruct the ground truth signal. Assumes the Poisson MLE formulation of the phase retrieval problem.
     :param A: The measurement matrix A, with \mathcal{A}(f) = |Af|^2 the measurement map
@@ -56,8 +86,18 @@ def find_minimizer(A: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], y: n
     :param y: The intensity measurement of our signal f_0. y_i distributed Pois(|<a_i, f_0>|^2)
     :return:
     """
+    f = spectral_initialization(y, A)
+    #Step size for the update function
+    mu: float = 1/la.norm(A)
 
-    pass
+    while True:
+        grad = compute_wirtinger_gradient(f, A, y)
+        f = f - (mu / n) * compute_wirtinger_gradient(f, A, y)
+
+        if np.linalg.norm(grad) < eps:
+            break
+
+    return f
 
 def calculate_reconstruction_error(f: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> float:
     return min(vector_norm(f - f0), vector_norm(f + f0))
