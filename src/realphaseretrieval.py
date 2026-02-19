@@ -88,7 +88,7 @@ def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> np
     """
     f = spectral_initialization(y, A)
     #Step size for the update function
-    mu: float = 1/la.norm(A)
+    mu: float = 1 / pow(la.norm(A), 2)
 
     while True:
         grad = compute_wirtinger_gradient(f, A, y)
