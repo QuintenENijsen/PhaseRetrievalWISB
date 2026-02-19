@@ -121,5 +121,13 @@ def calculate_range(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]
 
     return min_val, max_val
 
-vec = generate_gaussian_vector()
-print(vec)
+
+def run_phase_retrieval():
+    ground_truth = generate_gaussian_vector()
+    measurement_maps = [generate_measurement_matrix() for x in range(1, 100)]
+    measurements = map(lambda M: generate_measured(M, ground_truth), measurement_maps)
+    minimizers = map(lambda elem: find_minimizer(elem[0],elem[1]) , zip(measurement_maps, measurements))
+
+    #Calculate reconstruction errors and ranges
+    errors = map(lambda f: calculate_reconstruction_error(f, ground_truth),minimizers)
+    ranges = map(lambda mapsmins: calculate_range(mapsmins[0], ground_truth, mapsmins[1]),zip(measurement_maps, minimizers))

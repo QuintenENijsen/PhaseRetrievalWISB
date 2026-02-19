@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Wirtinger flow completed.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Fixed small error.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
@@ -82,7 +82,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1771423823360</updated>
-      <workItem from="1771510934454" duration="3111000" />
+      <workItem from="1771510934454" duration="5209000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -116,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771514410944</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fixed small error.">
+      <option name="closed" value="true" />
+      <created>1771514622860</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1771514622860</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,7 +135,8 @@
     <MESSAGE value="Set-up to calculate all relevent details, no Wirtinger flow." />
     <MESSAGE value="Final before Wirtinger Flow." />
     <MESSAGE value="Wirtinger flow completed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Wirtinger flow completed." />
+    <MESSAGE value="Fixed small error." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed small error." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
