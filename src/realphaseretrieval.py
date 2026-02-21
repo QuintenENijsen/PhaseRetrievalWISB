@@ -14,14 +14,14 @@ SEED_MEASUREMENT_MAP = ""
 
 
 #Dimension of ground_truth
-n: int = 20
+n: int = 5
 #Dimension of measurement
-m: int = 5*n
+m: int = 10*n
 #Stopping condition wirtinger flow
 eps = 1e-05
 MAX_ITER = 10_000
 #The norm of the ground truth, we want to be able to control this to differentiate high and low energy regimes
-norm_f0 = 10
+norm_f0 = 25000
 
 def vector_norm(f: npt.NDArray[np.float32]) -> float:
     return math.sqrt(np.sum(np.square(f)))
@@ -31,27 +31,27 @@ def generate_gaussian_vector() -> npt.NDArray[np.float32]:
     :return: A vector of size n whose components are Gaussian distributed random variables, where the vector has norm 1 in the ell^2 norm.
     """
 
-    rand_vec: npt.NDArray[np.float32] = np.array([rand.gauss(0, 1) for x in range(1, n)], dtype=np.float32)
+    rand_vec: npt.NDArray[np.float32] = np.array([rand.gauss(0, 1) for x in range(0, n)], dtype=np.float32)
     #Normalize the vector
     norm_vec: float = vector_norm(rand_vec)
 
     return rand_vec * (1.0 / norm_vec)
 
 def generate_measurement_matrix() -> npt.NDArray[np.float32]:
-    return np.array([generate_gaussian_vector() for x in range(1, m)])
+    return np.array([generate_gaussian_vector() for x in range(0, m)])
 
 def calculate_measurement(matrix: npt.NDArray[np.float32], row: int, f: npt.NDArray[np.float32]) -> float:
     if row >= m:
         return -1
     else:
-        a_row = matrix[row-1]
+        a_row = matrix[row]
         return abs(np.inner(a_row, f)) ** 2
 
 def generate_measured(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
     """Generates the y in the poisson phase retrieval problem, using the matrix A and assuming mathcal{A} = |Af|^2"""
     y = []
 
-    for i in range (1, m):
+    for i in range (0, m):
         y.append(np.random.poisson(calculate_measurement(matrix, i, f0)))
 
     return np.array(y)
@@ -64,9 +64,9 @@ def spectral_initialization(y: npt.NDArray[np.float32], A: npt.NDArray[np.float3
     :return: The Eigenvector of the largest Eigenvalue of 1/m sum_{i=1}^m y_i a_i a_i^t
     """
     #Calculate the matrix 1/m \sum_{i=1}^m y_i a_i a_i^t
-    Y: npt.NDArray[np.float32] = np.zeros((n-1, n-1), dtype=np.float32)
+    Y: npt.NDArray[np.float32] = np.zeros((n, n), dtype=np.float32)
 
-    for i in range (0, n-1):
+    for i in range (0, n):
         Y = Y + y[i] * (np.outer(A[i], A[i]))
 
     Y = 1/m * Y
@@ -117,8 +117,8 @@ def calculate_range(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]
     """
     min_val: float = sys.float_info.max
     max_val: float = sys.float_info.min
-
-    for i in range(1, m):
+    global m
+    for i in range(0, m):
         measurement_f: float = calculate_measurement(matrix, i, f)
         measurement_f0: float = calculate_measurement(matrix, i, f0)
         #print("f measurement: " + str(measurement_f) + "; f0 measurement: " + str(measurement_f0))
@@ -141,12 +141,32 @@ def plot_errors(errors: list[float]):
     plt.show()
     return
 
+def plot_4_errors(errors: list[list[float]]):
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+    sns.histplot(errors[0], bins=200, kde=True, ax=axes[0, 0])
+    axes[0, 0].set_title('m= n')
+
+    sns.histplot(errors[1], bins=200, kde=True, ax=axes[0, 1])
+    axes[0, 1].set_title('m=1.3n')
+
+    sns.histplot(errors[2], bins=200, kde=True, ax=axes[1, 0])
+    axes[1, 0].set_title('m=1.7n')
+
+    sns.histplot(errors[3], bins=200, kde=True, ax=axes[1, 1])
+    axes[1, 1].set_title('m=2n')
+
+    plt.tight_layout()
+    plt.show()
+
 def plot_ranges(ranges):
     min_quotient, max_quotient = zip(*ranges)
+    #print(min_quotient)
+    print(max_quotient)
     print(max(min_quotient))
     print(min(max_quotient))
 
-    sns.histplot(min_quotient, bins=200, kde=True, label='Min Error', color='blue', alpha=0.5)
+    sns.histplot(list(filter(lambda x: x < 2, min_quotient)), bins=200, kde=True, label='Min Error', color='blue', alpha=0.5)
     sns.histplot(max_quotient, bins=200, kde=True, label='Max Error', color='red', alpha=0.5)
 
     plt.xlabel('Logarithm ratio')
@@ -180,9 +200,10 @@ def run_phase_retrieval():
     with ProcessPoolExecutor() as executor:
         ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 1000)],minimizers))
 
-    #print("Max error: " + str(max(errors)))
-    #print("Min error: " + str(min(errors)))
-    #print(ranges)
+
+    print("Max error: " + str(max(errors)))
+    print("Min error: " + str(min(errors)))
+
     plot_errors(errors)
     plot_ranges(ranges)
 

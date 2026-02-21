@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Fixed small error.">
-      <change beforePath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Model werkt, goofy aah resultaten tho.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
@@ -126,7 +124,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771514622860</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Model werkt, goofy aah resultaten tho.">
+      <option name="closed" value="true" />
+      <created>1771671807770</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1771671807770</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,7 +144,8 @@
     <MESSAGE value="Final before Wirtinger Flow." />
     <MESSAGE value="Wirtinger flow completed." />
     <MESSAGE value="Fixed small error." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed small error." />
+    <MESSAGE value="Model werkt, goofy aah resultaten tho." />
+    <option name="LAST_COMMIT_MESSAGE" value="Model werkt, goofy aah resultaten tho." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
