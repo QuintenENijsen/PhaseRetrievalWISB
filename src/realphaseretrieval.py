@@ -16,7 +16,7 @@ SEED_MEASUREMENT_MAP = ""
 #Dimension of ground_truth
 n: int = 5
 #Dimension of measurement
-m: int = 10*n
+m: int = 200*n
 #Stopping condition wirtinger flow
 eps = 1e-05
 MAX_ITER = 10_000
@@ -76,7 +76,7 @@ def spectral_initialization(y: npt.NDArray[np.float32], A: npt.NDArray[np.float3
 
     square_norm = lambda x: np.dot(x,x)
 
-    new_norm = math.sqrt(n * (np.sum(y) / float(np.sum(np.fromiter( (square_norm(ai) for ai in A), np.float32)))))
+    new_norm = math.sqrt(n * sum(y.tolist()) / np.sum(A**2))
     max_eigenvector = eigenvectors[max_index]
 
     return (new_norm / np.dot(max_eigenvector, max_eigenvector)) * max_eigenvector
@@ -124,8 +124,8 @@ def calculate_range(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]
         #print("f measurement: " + str(measurement_f) + "; f0 measurement: " + str(measurement_f0))
 
         quotient = measurement_f / measurement_f0
-        if quotient > 1e5:
-            print(str(f) + "; " + str(f0))
+        #if quotient > 1e5:
+            #print(str(f) + "; " + str(f0))
         if quotient < min_val:
             min_val = quotient
         if quotient > max_val:
@@ -145,26 +145,51 @@ def plot_4_errors(errors: list[list[float]]):
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     sns.histplot(errors[0], bins=200, kde=True, ax=axes[0, 0])
-    axes[0, 0].set_title('m= n')
+    axes[0, 0].set_title('norm f_0 is 1')
 
     sns.histplot(errors[1], bins=200, kde=True, ax=axes[0, 1])
-    axes[0, 1].set_title('m=1.3n')
+    axes[0, 1].set_title('norm f_0 is 5')
 
     sns.histplot(errors[2], bins=200, kde=True, ax=axes[1, 0])
-    axes[1, 0].set_title('m=1.7n')
+    axes[1, 0].set_title('norm f_0 is 10')
 
     sns.histplot(errors[3], bins=200, kde=True, ax=axes[1, 1])
-    axes[1, 1].set_title('m=2n')
+    axes[1, 1].set_title('norm f_0 is 50')
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_4_ranges(ranges):
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+    if ranges[0]:
+        min0, max0 = zip(*ranges[0])
+    else:
+        max0 = []
+
+    sns.histplot(max0, bins=20, kde=True, ax=axes[0,0], legend=False)
+    axes[0, 0].set_title('intensity is 1')
+
+    min1, max1 = zip(*ranges[1])
+
+    sns.histplot(max1, bins=20, kde=True, ax=axes[0,1], legend=False)
+    axes[0, 1].set_title('Intensity is 5')
+
+    min2,max2 = zip(*ranges[2])
+
+    sns.histplot(max2, bins=20, kde=True, ax=axes[1,0], legend=False)
+    axes[1, 0].set_title('Intensity is 10')
+
+    min3, max3 = zip(*ranges[3])
+
+    sns.histplot(max3, bins=20, kde=True, ax=axes[1,1], legend=False)
+    axes[1, 1].set_title('Intensity is 50')
 
     plt.tight_layout()
     plt.show()
 
 def plot_ranges(ranges):
     min_quotient, max_quotient = zip(*ranges)
-    #print(min_quotient)
-    print(max_quotient)
-    print(max(min_quotient))
-    print(min(max_quotient))
 
     sns.histplot(list(filter(lambda x: x < 2, min_quotient)), bins=200, kde=True, label='Min Error', color='blue', alpha=0.5)
     sns.histplot(max_quotient, bins=200, kde=True, label='Max Error', color='red', alpha=0.5)
@@ -186,26 +211,36 @@ def find_range(A, f0, f):
     return calculate_range(A, f0, f)
 
 def run_phase_retrieval():
-    ground_truth = generate_gaussian_vector() * norm_f0
-    measurement_maps = [generate_measurement_matrix() for x in range(1, 1000)]
-    measurements = list(map(lambda M: generate_measured(M, ground_truth), measurement_maps))
+    ground_truth = generate_gaussian_vector()
+    norms = [1, 5, 10, 50]
+    errorss = []
+    rangess = []
+    for i in range(0,4):
+        ground_truth *= norms[i]
+        measurement_maps = [generate_measurement_matrix() for x in range(1, 100)]
+        measurements = list(map(lambda M: generate_measured(M, ground_truth), measurement_maps))
 
-    with ProcessPoolExecutor() as executor:
-        minimizers = list(executor.map(get_min, measurement_maps, measurements))
+        with ProcessPoolExecutor() as executor:
+            minimizers = list(executor.map(get_min, measurement_maps, measurements))
 
-    #Calculate reconstruction errors and ranges
-    with ProcessPoolExecutor() as executor:
-        errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 1000)]))
+        #Calculate reconstruction errors and ranges
+        with ProcessPoolExecutor() as executor:
+            errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 100)]))
 
-    with ProcessPoolExecutor() as executor:
-        ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 1000)],minimizers))
+        with ProcessPoolExecutor() as executor:
+            ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers))
 
+        ranges = list(filter(lambda x: x[1] < 300, ranges))
+        rangess.append(ranges)
+        errorss.append(errors)
 
-    print("Max error: " + str(max(errors)))
-    print("Min error: " + str(min(errors)))
+    plot_4_errors(errorss)
+    plot_4_ranges(rangess)
+    #print("Max error: " + str(max(errors)))
+    #print("Min error: " + str(min(errors)))
 
-    plot_errors(errors)
-    plot_ranges(ranges)
+    #plot_errors(errors)
+    #plot_ranges(ranges)
 
 if __name__ == "__main__":
     run_phase_retrieval()

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Model werkt, goofy aah resultaten tho.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Laatste veranderingen toegevoegd.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
@@ -29,12 +29,12 @@
     &quot;assignee&quot;: &quot;QuintenENijsen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/QuintenENijsen/PhaseRetrievalWISB.git&quot;,
-    &quot;accountId&quot;: &quot;c233fd5b-3670-4fc2-b72e-0e8229574d7a&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/QuintenENijsen/PhaseRetrievalWISB.git",
+    "accountId": "5f88308e-255c-44d0-bba2-edefc64801a3"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -132,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771671807770</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Laatste veranderingen toegevoegd.">
+      <option name="closed" value="true" />
+      <created>1771693640751</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1771693640751</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -145,7 +153,8 @@
     <MESSAGE value="Wirtinger flow completed." />
     <MESSAGE value="Fixed small error." />
     <MESSAGE value="Model werkt, goofy aah resultaten tho." />
-    <option name="LAST_COMMIT_MESSAGE" value="Model werkt, goofy aah resultaten tho." />
+    <MESSAGE value="Laatste veranderingen toegevoegd." />
+    <option name="LAST_COMMIT_MESSAGE" value="Laatste veranderingen toegevoegd." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
