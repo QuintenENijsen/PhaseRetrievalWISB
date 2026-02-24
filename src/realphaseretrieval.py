@@ -14,19 +14,19 @@ SEED_MEASUREMENT_MAP = ""
 
 
 #Dimension of ground_truth
-n: int = 5
+#n: int = 5
 #Dimension of measurement
-m: int = 200*n
+#m: int = 200*n
 #Stopping condition wirtinger flow
 eps = 1e-05
 MAX_ITER = 10_000
 #The norm of the ground truth, we want to be able to control this to differentiate high and low energy regimes
-norm_f0 = 25000
+norm_f0 = 10000
 
 def vector_norm(f: npt.NDArray[np.float32]) -> float:
     return math.sqrt(np.sum(np.square(f)))
 
-def generate_gaussian_vector() -> npt.NDArray[np.float32]:
+def generate_gaussian_vector(n: int) -> npt.NDArray[np.float32]:
     """
     :return: A vector of size n whose components are Gaussian distributed random variables, where the vector has norm 1 in the ell^2 norm.
     """
@@ -37,26 +37,26 @@ def generate_gaussian_vector() -> npt.NDArray[np.float32]:
 
     return rand_vec * (1.0 / norm_vec)
 
-def generate_measurement_matrix() -> npt.NDArray[np.float32]:
-    return np.array([generate_gaussian_vector() for x in range(0, m)])
+def generate_measurement_matrix(n: int, m: int) -> npt.NDArray[np.float32]:
+    return np.array([generate_gaussian_vector(n) for x in range(0, m)])
 
-def calculate_measurement(matrix: npt.NDArray[np.float32], row: int, f: npt.NDArray[np.float32]) -> float:
+def calculate_measurement(matrix: npt.NDArray[np.float32], row: int, f: npt.NDArray[np.float32], m: int) -> float:
     if row >= m:
         return -1
     else:
         a_row = matrix[row]
         return abs(np.inner(a_row, f)) ** 2
 
-def generate_measured(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+def generate_measured(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], m: int) -> npt.NDArray[np.float32]:
     """Generates the y in the poisson phase retrieval problem, using the matrix A and assuming mathcal{A} = |Af|^2"""
     y = []
 
     for i in range (0, m):
-        y.append(np.random.poisson(calculate_measurement(matrix, i, f0)))
+        y.append(np.random.poisson(calculate_measurement(matrix, i, f0, m)))
 
     return np.array(y)
 
-def spectral_initialization(y: npt.NDArray[np.float32], A: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+def spectral_initialization(y: npt.NDArray[np.float32], A: npt.NDArray[np.float32], n: int, m: int) -> npt.NDArray[np.float32]:
     """
     Performs initialization based on the spectral initialization method as defined in Candès, et al. (2015)
     :param y: The measurements
@@ -88,7 +88,7 @@ def compute_wirtinger_gradient(f: npt.NDArray[np.float32], A: npt.NDArray[np.flo
     weighted = weights * inner_products
     return A.T @ weighted
 
-def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32], n: int, m: int) -> npt.NDArray[np.float32]:
     """
     Performs the wirtinger flow algorithm to reconstruct the ground truth signal. Assumes the Poisson MLE formulation of the phase retrieval problem.
     :param A: The measurement matrix A, with mathcal{A}(f) = |Af|^2 the measurement map
@@ -96,7 +96,7 @@ def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> np
     :param y: The intensity measurement of our signal f_0. y_i distributed Pois(|<a_i, f_0>|^2)
     :return:
     """
-    f = spectral_initialization(y, A)
+    f = spectral_initialization(y, A, n, m)
     #Step size for the update function
     mu: float = 1 / pow(la.norm(A), 2)
     iter = 0
@@ -111,16 +111,16 @@ def find_minimizer(A: npt.NDArray[np.float32], y: npt.NDArray[np.float32]) -> np
 def calculate_reconstruction_error(f: npt.NDArray[np.float32], f0: npt.NDArray[np.float32]) -> float:
     return min(vector_norm(f - f0), vector_norm(f + f0))
 
-def calculate_range(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], f: npt.NDArray[np.float32]) -> type[float, float]:
+def calculate_range(matrix: npt.NDArray[np.float32], f0: npt.NDArray[np.float32], f: npt.NDArray[np.float32], m: int) -> type[float, float]:
     """
     :return: The range that the fraction (|<a_i, tilde{f}>|^2 / |<a_i, f_0>|^2) lives in. The left float is the minimum, right the maximum.
     """
     min_val: float = sys.float_info.max
     max_val: float = sys.float_info.min
-    global m
+
     for i in range(0, m):
-        measurement_f: float = calculate_measurement(matrix, i, f)
-        measurement_f0: float = calculate_measurement(matrix, i, f0)
+        measurement_f: float = calculate_measurement(matrix, i, f, m)
+        measurement_f0: float = calculate_measurement(matrix, i, f0, m)
         #print("f measurement: " + str(measurement_f) + "; f0 measurement: " + str(measurement_f0))
 
         quotient = measurement_f / measurement_f0
@@ -201,34 +201,37 @@ def plot_ranges(ranges):
     return
 
 #Only used to be able to map to the ProcessPoolExecutor
-def get_min(measurement_map, measurement):
-    return find_minimizer(measurement_map, measurement)
+def get_min(measurement_map, measurement, n, m):
+    return find_minimizer(measurement_map, measurement, n, m)
+
 
 def find_error(f, ground_truth):
     return calculate_reconstruction_error(f, ground_truth)
 
-def find_range(A, f0, f):
-    return calculate_range(A, f0, f)
+def find_range(A, f0, f, m):
+    return calculate_range(A, f0, f, m)
 
 def run_phase_retrieval():
-    ground_truth = generate_gaussian_vector()
+    n = 5
+    m = 200*n
+    ground_truth = generate_gaussian_vector(n)
     norms = [1, 5, 10, 50]
     errorss = []
     rangess = []
     for i in range(0,4):
         ground_truth *= norms[i]
-        measurement_maps = [generate_measurement_matrix() for x in range(1, 100)]
-        measurements = list(map(lambda M: generate_measured(M, ground_truth), measurement_maps))
+        measurement_maps = [generate_measurement_matrix(n,m) for x in range(1, 100)]
+        measurements = list(map(lambda M: generate_measured(M, ground_truth, m), measurement_maps))
 
         with ProcessPoolExecutor() as executor:
-            minimizers = list(executor.map(get_min, measurement_maps, measurements))
+            minimizers = list(executor.map(get_min, measurement_maps, measurements, [n for x in range(1, 100)], [m for x in range(1,100)]))
 
         #Calculate reconstruction errors and ranges
         with ProcessPoolExecutor() as executor:
             errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 100)]))
 
         with ProcessPoolExecutor() as executor:
-            ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers))
+            ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers, [m for x in range(1,100)]))
 
         ranges = list(filter(lambda x: x[1] < 300, ranges))
         rangess.append(ranges)
@@ -242,5 +245,55 @@ def run_phase_retrieval():
     #plot_errors(errors)
     #plot_ranges(ranges)
 
+def plot_average_sim(ns: list[int], ms: list[int], errors: list[list[float]]):
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    axes = axes.flatten()  # makes indexing easier: axes[0], axes[1], etc.
+
+    for idx, n in enumerate(ns):
+        axes[idx].plot(ms, errors[idx])
+        axes[idx].set_title(f'n = {n}')
+        axes[idx].set_xlabel('m')
+        axes[idx].set_ylabel('Error')
+
+    plt.tight_layout()
+    plt.show()
+
+def run_average_sim():
+    ns = [2, 5, 7, 10]
+    ms = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
+    errors_across_n = []
+    maxranges_across_n = []
+    for n in ns:
+        ground_truth = generate_gaussian_vector(n) * norm_f0
+        errors_across_m = []
+        maxranges_across_m = []
+        for m in ms:
+            m = m * n
+            measurement_maps = [generate_measurement_matrix(n, m) for x in range(1, 200)]
+            measurements = list(map(lambda M: generate_measured(M, ground_truth, m), measurement_maps))
+            with ProcessPoolExecutor() as executor:
+                minimizers = list(executor.map(get_min, measurement_maps, measurements, [n for x in range(1,100)], [m for x in range(1,200)]))
+
+            #Calculate reconstruction errors and ranges
+            with ProcessPoolExecutor() as executor:
+                errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 200)]))
+
+            with ProcessPoolExecutor() as executor:
+                ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers, [m for x in range(1,100)]))
+
+            minrange, maxrange = zip(*ranges)
+
+            errors_across_m.append(sum(errors) / len(errors))
+            avg_error = sum(maxrange) / len(maxrange)
+            maxranges_across_m.append(min(50, avg_error))
+
+        errors_across_n.append(errors_across_m)
+        maxranges_across_n.append(maxranges_across_m)
+
+    plot_average_sim(ns, ms, errors_across_n)
+
+    plot_average_sim(ns, ms, maxranges_across_n)
+    return
+
 if __name__ == "__main__":
-    run_phase_retrieval()
+    run_average_sim()

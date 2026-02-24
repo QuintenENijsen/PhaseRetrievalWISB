@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Laatste veranderingen toegevoegd.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
@@ -29,12 +29,12 @@
     &quot;assignee&quot;: &quot;QuintenENijsen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/QuintenENijsen/PhaseRetrievalWISB.git",
-    "accountId": "5f88308e-255c-44d0-bba2-edefc64801a3"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/QuintenENijsen/PhaseRetrievalWISB.git&quot;,
+    &quot;accountId&quot;: &quot;5f88308e-255c-44d0-bba2-edefc64801a3&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -140,7 +140,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771693640751</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="extra plaatjes genereerd, plus verschillende energie levels.">
+      <option name="closed" value="true" />
+      <created>1771867836079</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1771867836079</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,7 +162,8 @@
     <MESSAGE value="Fixed small error." />
     <MESSAGE value="Model werkt, goofy aah resultaten tho." />
     <MESSAGE value="Laatste veranderingen toegevoegd." />
-    <option name="LAST_COMMIT_MESSAGE" value="Laatste veranderingen toegevoegd." />
+    <MESSAGE value="extra plaatjes genereerd, plus verschillende energie levels." />
+    <option name="LAST_COMMIT_MESSAGE" value="extra plaatjes genereerd, plus verschillende energie levels." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
