@@ -8,6 +8,7 @@ import math
 from concurrent.futures import ProcessPoolExecutor
 import matplotlib.pyplot as plt
 import seaborn as sns
+from itertools import product
 
 SEED_GROUND_TRUTH = ""
 SEED_MEASUREMENT_MAP = ""
@@ -200,50 +201,11 @@ def plot_ranges(ranges):
     plt.show()
     return
 
-#Only used to be able to map to the ProcessPoolExecutor
-def get_min(measurement_map, measurement, n, m):
-    return find_minimizer(measurement_map, measurement, n, m)
-
-
-def find_error(f, ground_truth):
-    return calculate_reconstruction_error(f, ground_truth)
-
-def find_range(A, f0, f, m):
-    return calculate_range(A, f0, f, m)
-
-def run_phase_retrieval():
-    n = 5
-    m = 200*n
-    ground_truth = generate_gaussian_vector(n)
-    norms = [1, 5, 10, 50]
-    errorss = []
-    rangess = []
-    for i in range(0,4):
-        ground_truth *= norms[i]
-        measurement_maps = [generate_measurement_matrix(n,m) for x in range(1, 100)]
-        measurements = list(map(lambda M: generate_measured(M, ground_truth, m), measurement_maps))
-
-        with ProcessPoolExecutor() as executor:
-            minimizers = list(executor.map(get_min, measurement_maps, measurements, [n for x in range(1, 100)], [m for x in range(1,100)]))
-
-        #Calculate reconstruction errors and ranges
-        with ProcessPoolExecutor() as executor:
-            errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 100)]))
-
-        with ProcessPoolExecutor() as executor:
-            ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers, [m for x in range(1,100)]))
-
-        ranges = list(filter(lambda x: x[1] < 300, ranges))
-        rangess.append(ranges)
-        errorss.append(errors)
-
-    plot_4_errors(errorss)
-    plot_4_ranges(rangess)
-    #print("Max error: " + str(max(errors)))
-    #print("Min error: " + str(min(errors)))
-
-    #plot_errors(errors)
-    #plot_ranges(ranges)
+def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
+    minimizer = find_minimizer(measurement_map, measurement, n, m)
+    error = calculate_reconstruction_error(minimizer, ground_truth)
+    range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
+    return minimizer, error, range_
 
 def plot_average_sim(ns: list[int], ms: list[int], errors: list[list[float]]):
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
@@ -258,42 +220,45 @@ def plot_average_sim(ns: list[int], ms: list[int], errors: list[list[float]]):
     plt.tight_layout()
     plt.show()
 
+def compute_for_nm(n_m, norm_f0):
+    n = n_m[0]
+    m_ratio = n_m[1]
+    m = m_ratio * n
+    ground_truth = generate_gaussian_vector(n) * norm_f0
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(1, 50)]
+    measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
+
+    results = [compute_min_errors_ranges(mm, meas, n, m, ground_truth)
+               for mm, meas in zip(measurement_maps, measurements)]
+
+    minimizers, errors, ranges = zip(*results)
+    minrange, maxrange = zip(*ranges)
+
+    avg_error = sum(errors) / len(errors)
+    avg_maxrange = min(50, sum(maxrange) / len(maxrange))
+    return n, m_ratio, avg_error, avg_maxrange
+
 def run_average_sim():
-    ns = [2, 5, 7, 10]
-    ms = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
-    errors_across_n = []
-    maxranges_across_n = []
-    for n in ns:
-        ground_truth = generate_gaussian_vector(n) * norm_f0
-        errors_across_m = []
-        maxranges_across_m = []
-        for m in ms:
-            m = m * n
-            measurement_maps = [generate_measurement_matrix(n, m) for x in range(1, 200)]
-            measurements = list(map(lambda M: generate_measured(M, ground_truth, m), measurement_maps))
-            with ProcessPoolExecutor() as executor:
-                minimizers = list(executor.map(get_min, measurement_maps, measurements, [n for x in range(1,100)], [m for x in range(1,200)]))
+    ns = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    ms = [4 * n**2 for n in ns]  # your ms list
 
-            #Calculate reconstruction errors and ranges
-            with ProcessPoolExecutor() as executor:
-                errors = list(executor.map( find_error,minimizers, [ground_truth for x in range(1, 200)]))
+    jobs = list(product(ns, ms))
 
-            with ProcessPoolExecutor() as executor:
-                ranges = list(executor.map(find_range, measurement_maps, [ground_truth for x in range(1, 100)],minimizers, [m for x in range(1,100)]))
+    with ProcessPoolExecutor() as executor:
+        all_results = list(executor.map(compute_for_nm, jobs, [norm_f0 for x in range(len(jobs))]))
 
-            minrange, maxrange = zip(*ranges)
+    # Reconstruct per-n lists
+    errors_across_n = {n: [] for n in ns}
+    maxranges_across_n = {n: [] for n in ns}
 
-            errors_across_m.append(sum(errors) / len(errors))
-            avg_error = sum(maxrange) / len(maxrange)
-            maxranges_across_m.append(min(50, avg_error))
+    for n, m_ratio, avg_error, avg_maxrange in all_results:
+        errors_across_n[n].append(avg_error)
+        maxranges_across_n[n].append(avg_maxrange)
 
-        errors_across_n.append(errors_across_m)
-        maxranges_across_n.append(maxranges_across_m)
+    #Here the heat map picture function should come.
 
-    plot_average_sim(ns, ms, errors_across_n)
-
-    plot_average_sim(ns, ms, maxranges_across_n)
-    return
+    #plot_average_sim(ns, ms, [errors_across_n[n] for n in ns])
+    #plot_average_sim(ns, ms, [maxranges_across_n[n] for n in ns])
 
 if __name__ == "__main__":
     run_average_sim()
