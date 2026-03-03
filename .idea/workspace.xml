@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/plotting.py" afterDir="false" />
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Paralellized the code more.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/plotting.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -149,7 +149,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771867836079</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Paralellized the code more.">
+      <option name="closed" value="true" />
+      <created>1772471113855</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1772471113855</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,7 +172,8 @@
     <MESSAGE value="Model werkt, goofy aah resultaten tho." />
     <MESSAGE value="Laatste veranderingen toegevoegd." />
     <MESSAGE value="extra plaatjes genereerd, plus verschillende energie levels." />
-    <option name="LAST_COMMIT_MESSAGE" value="extra plaatjes genereerd, plus verschillende energie levels." />
+    <MESSAGE value="Paralellized the code more." />
+    <option name="LAST_COMMIT_MESSAGE" value="Paralellized the code more." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
