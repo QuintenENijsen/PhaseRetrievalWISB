@@ -163,8 +163,8 @@ def compute_for_nm(n_m, norm_f0):
     return n, m_ratio, avg_error, avg_maxrange
 
 def run_average_sim():
-    ns = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]# 45, 50]
-    oversampling_ratios = [2 * n**2 for n in ns]  # your ms list
+    ns = [5, 7, 10, 12, 15, 17, 20, 22, 25, 27]# 45, 50]
+    oversampling_ratios = [20 * n for n in ns]  # your ms list
 
     jobs = list(product(ns, oversampling_ratios))
 

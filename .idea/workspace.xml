@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Paralellized the code more.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Added numba, got heatmap for n=5-20.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/plotting.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -157,7 +156,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772471113855</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added numba, got heatmap for n=5-20.">
+      <option name="closed" value="true" />
+      <created>1772567015031</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1772567015031</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,7 +180,8 @@
     <MESSAGE value="Laatste veranderingen toegevoegd." />
     <MESSAGE value="extra plaatjes genereerd, plus verschillende energie levels." />
     <MESSAGE value="Paralellized the code more." />
-    <option name="LAST_COMMIT_MESSAGE" value="Paralellized the code more." />
+    <MESSAGE value="Added numba, got heatmap for n=5-20." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added numba, got heatmap for n=5-20." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
