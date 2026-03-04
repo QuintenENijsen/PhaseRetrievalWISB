@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Added numba, got heatmap for n=5-20.">
+      <change beforePath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
     </list>

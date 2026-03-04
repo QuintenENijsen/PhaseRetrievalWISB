@@ -76,10 +76,10 @@ def spectral_initialization(y: npt.NDArray[np.float64], A: npt.NDArray[np.float6
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)
 
-    new_norm = math.sqrt(n * np.sum(y.astype(np.float64)) / np.sum(A**2))
+    new_norm = math.sqrt(n * np.sum(y.astype(np.float64)) / np.sum(np.linalg.norm(A, axis=1)))
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
-    return (new_norm / np.dot(max_eigenvector, max_eigenvector)) * max_eigenvector
+    return (new_norm / math.sqrt(np.dot(max_eigenvector, max_eigenvector))) * max_eigenvector
 
 @njit
 def compute_wirtinger_gradient(f: npt.NDArray[np.float64], A: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
