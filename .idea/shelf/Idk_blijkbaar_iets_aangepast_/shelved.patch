@@ -1,0 +1,90 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"e439e502-eed4-4ab7-ab23-44480a06fbda\" name=\"Changes\" comment=\"Final before Wirtinger Flow.\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/realphaseretrieval.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/realphaseretrieval.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\n  \"lastFilter\": {\n    \"state\": \"OPEN\",\n    \"assignee\": \"QuintenENijsen\"\n  }\n}]]></component>\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\n  \"selectedUrlAndAccountId\": {\n    \"url\": \"https://github.com/QuintenENijsen/PhaseRetrievalWISB.git\",\n    \"accountId\": \"5f88308e-255c-44d0-bba2-edefc64801a3\"\n  }\n}]]></component>\n  <component name=\"ProjectColorInfo\"><![CDATA[{\n  \"associatedIndex\": 1\n}]]></component>\n  <component name=\"ProjectId\" id=\"39qVvoe70JphTTaNX2Lp8mZ5uF9\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"master\",\n    \"settings.editor.selected.configurable\": \"preferences.pluginManager\"\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/src\" />\n    </key>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"e439e502-eed4-4ab7-ab23-44480a06fbda\" name=\"Changes\" comment=\"\" />\n      <created>1771423823360</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1771423823360</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Initial commit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1771423842535</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1771423842535</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"Set-up to calculate all relevent details, no Wirtinger flow.\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1771434075952</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1771434075952</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Final before Wirtinger Flow.\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1771435247415</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1771435247415</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"4\" />\n    <servers />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Initial commit\" />\n    <MESSAGE value=\"Set-up to calculate all relevent details, no Wirtinger flow.\" />\n    <MESSAGE value=\"Final before Wirtinger Flow.\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Final before Wirtinger Flow.\" />\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/src/main.py</url>\n          <line>8</line>\n          <option name=\"timeStamp\" value=\"1\" />\n        </line-breakpoint>\n      </breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 827b1e2f62ea262aed5293bfa11ee859373991a2)
++++ b/.idea/workspace.xml	(date 1771576638897)
+@@ -4,9 +4,8 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Final before Wirtinger Flow.">
++    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Idk blijkbaar iets aangepast.">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/realphaseretrieval.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -23,21 +22,21 @@
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "QuintenENijsen"
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;QuintenENijsen&quot;
+   }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/QuintenENijsen/PhaseRetrievalWISB.git",
+-    "accountId": "5f88308e-255c-44d0-bba2-edefc64801a3"
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/QuintenENijsen/PhaseRetrievalWISB.git&quot;,
++    &quot;accountId&quot;: &quot;5f88308e-255c-44d0-bba2-edefc64801a3&quot;
+   }
+-}]]></component>
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "associatedIndex": 1
+-}]]></component>
++}</component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 1
++}</component>
+   <component name="ProjectId" id="39qVvoe70JphTTaNX2Lp8mZ5uF9" />
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+@@ -50,6 +49,7 @@
+     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+     "RunOnceActivity.git.unshallow": "true",
+     "git-widget-placeholder": "master",
++    "last_opened_file_path": "/home/quintennijsen/Documents/Devoted/Devoted",
+     "settings.editor.selected.configurable": "preferences.pluginManager"
+   }
+ }]]></component>
+@@ -90,14 +90,23 @@
+       <option name="project" value="LOCAL" />
+       <updated>1771435247415</updated>
+     </task>
+-    <option name="localTasksCounter" value="4" />
++    <task id="LOCAL-00004" summary="Idk blijkbaar iets aangepast.">
++      <option name="closed" value="true" />
++      <created>1771442093024</created>
++      <option name="number" value="00004" />
++      <option name="presentableId" value="LOCAL-00004" />
++      <option name="project" value="LOCAL" />
++      <updated>1771442093024</updated>
++    </task>
++    <option name="localTasksCounter" value="5" />
+     <servers />
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="Initial commit" />
+     <MESSAGE value="Set-up to calculate all relevent details, no Wirtinger flow." />
+     <MESSAGE value="Final before Wirtinger Flow." />
+-    <option name="LAST_COMMIT_MESSAGE" value="Final before Wirtinger Flow." />
++    <MESSAGE value="Idk blijkbaar iets aangepast." />
++    <option name="LAST_COMMIT_MESSAGE" value="Idk blijkbaar iets aangepast." />
+   </component>
+   <component name="XDebuggerManager">
+     <breakpoint-manager>

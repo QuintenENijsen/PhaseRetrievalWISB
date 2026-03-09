@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Structuur codebase aangepast om beter om te gaan met de meerdere modules.">
+      <change beforePath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,12 +30,12 @@
     &quot;assignee&quot;: &quot;QuintenENijsen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/QuintenENijsen/PhaseRetrievalWISB.git",
-    "accountId": "c233fd5b-3670-4fc2-b72e-0e8229574d7a"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/QuintenENijsen/PhaseRetrievalWISB.git&quot;,
+    &quot;accountId&quot;: &quot;c233fd5b-3670-4fc2-b72e-0e8229574d7a&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
