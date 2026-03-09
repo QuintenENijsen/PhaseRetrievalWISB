@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Small fix to get correct initialization.">
-      <change afterPath="$PROJECT_DIR$/src/Errorcalc/error_calc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Initialization/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Initialization/pr_init.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Plotting/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_truncated_wf.py" afterDir="false" />
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Structuur codebase aangepast om beter om te gaan met de meerdere modules.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/realphaseretrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_wirtinger_flow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,7 +175,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772616660820</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Structuur codebase aangepast om beter om te gaan met de meerdere modules.">
+      <option name="closed" value="true" />
+      <created>1773071779392</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1773071779392</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,7 +201,8 @@
     <MESSAGE value="Paralellized the code more." />
     <MESSAGE value="Added numba, got heatmap for n=5-20." />
     <MESSAGE value="Small fix to get correct initialization." />
-    <option name="LAST_COMMIT_MESSAGE" value="Small fix to get correct initialization." />
+    <MESSAGE value="Structuur codebase aangepast om beter om te gaan met de meerdere modules." />
+    <option name="LAST_COMMIT_MESSAGE" value="Structuur codebase aangepast om beter om te gaan met de meerdere modules." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
