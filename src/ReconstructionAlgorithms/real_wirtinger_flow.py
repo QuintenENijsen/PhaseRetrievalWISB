@@ -9,7 +9,7 @@ from concurrent.futures import ProcessPoolExecutor
 import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import product
-from plotting import plot_heat_map
+from src.Plotting.plotting import plot_heat_map
 from numba import njit
 
 SEED_GROUND_TRUTH = ""
