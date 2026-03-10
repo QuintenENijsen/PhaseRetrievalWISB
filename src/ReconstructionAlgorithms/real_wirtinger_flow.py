@@ -104,7 +104,7 @@ def find_minimizer(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: in
     ix = 0
     while ix < MAX_ITER:
         grad = compute_wirtinger_gradient(f, A, y)
-        f = f - (mu / n) * compute_wirtinger_gradient(f, A, y)
+        f = f - (mu / n) * grad
         ix += 1
         if np.linalg.norm(grad) < eps:
             break
