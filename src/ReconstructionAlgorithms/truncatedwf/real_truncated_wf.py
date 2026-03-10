@@ -15,9 +15,9 @@ MAX_ITER = 10_000
 norm_f0 = 100
 
 #Fake values
-alpha_y = 10
-alpha_f_lb = 10
-alpha_f_ub = 10
+alpha_y = 5     #Paper states >= 3
+alpha_f_lb = 0.25     #Paper states should be 0 <= alpha <= 0.5
+alpha_f_ub = 7.5     #Paper states that >= 5
 
 @njit
 def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int)-> npt.NDArray[np.float64]:
@@ -43,7 +43,7 @@ def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n
 @njit
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
     f = trunc_spectral_init(A, y, n, m)
-    mu = 0  #Make this some suitable positive constant, should be in the paper.
+    mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
     ix = 0
     while ix < MAX_ITER:
         grad = truncatedwf.truncatedGradient(f, y, A, n)
