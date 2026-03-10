@@ -1,13 +1,16 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))  # FIX 1: lets Python find truncatedwf.so
+
 from src.Initialization.pr_init import generate_gaussian_vector, generate_measurement_matrix, generate_measured, calculate_reconstruction_error, calculate_range
 import numpy as np
 from numpy import linalg as la
 import numpy.typing as npt
 import math
-from numba import njit
 from src.Plotting.plotting import plot_heat_map
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
-import truncatedwf
+from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent
 
 
 eps = 1e-05
@@ -19,7 +22,6 @@ alpha_y = 5     #Paper states >= 3
 alpha_f_lb = 0.25     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 7.5     #Paper states that >= 5
 
-@njit
 def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int)-> npt.NDArray[np.float64]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
     factor: float = math.sqrt(m * n / (np.sum(np.linalg.norm(A, axis=1))))
@@ -40,19 +42,10 @@ def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n
 
     return factor * lambda_0 * max_eigenvector
 
-@njit
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
     f = trunc_spectral_init(A, y, n, m)
     mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
-    ix = 0
-    while ix < MAX_ITER:
-        grad = truncatedwf.truncatedGradient(f, y, A, n)
-        f =  f - (mu / m) * grad
-        ix += 1
-        if la.norm(grad) < eps:
-            break
-
-    return f
+    return truncGradientDescent(f, y, A, mu, MAX_ITER, eps, alpha_f_lb, alpha_f_ub, alpha_y);
 
 def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
     minimizer = gradient_descent(measurement_map, measurement, n, m)
@@ -82,15 +75,14 @@ def compute_for_nm(n_m, norm_f0):
     return n, m_ratio, avg_error, avg_maxrange
 
 def run_average_sim():
-    ns = [5, 7, 10, 12, 15, 17, 20, 22, 25, 27]# 45, 50]
-    oversampling_ratios = [20 * n for n in ns]  # your ms list
+    ns = [5, 10, 15, 20]# 45, 50]
+    oversampling_ratios = [2,4,6,8]  # your ms list
 
     jobs = list(product(ns, oversampling_ratios))
 
     with ProcessPoolExecutor() as executor:
         all_results = list(executor.map(compute_for_nm, jobs, [norm_f0 for x in range(len(jobs))]))
 
-    # Reconstruct per-n lists
     print(all_results)
 
     errors_across_n = {n: [] for n in ns}
@@ -100,10 +92,8 @@ def run_average_sim():
         errors_across_n[n].append(avg_error)
         maxranges_across_n[n].append(avg_maxrange)
 
-    # Lookup dictionary
     error_lookup = {(n, m): err for n, m, err, _ in all_results}
 
-    # Build matrix
     error_matrix = np.array([
         [error_lookup[(n, m)] for m in oversampling_ratios]
         for n in ns
@@ -111,5 +101,7 @@ def run_average_sim():
 
     print(error_matrix)
 
-    #Here the heat map picture function should come.
     plot_heat_map(ns, oversampling_ratios, error_matrix, norm_f0)
+
+if __name__ == "__main__":
+    run_average_sim()

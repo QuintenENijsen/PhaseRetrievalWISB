@@ -31,7 +31,7 @@ bool inE2(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double alpha_f, i
     return lhs <= rhs;
 }
 
-py::array_t<double> truncatedGradient(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double alpha_lb, double alpha_ub, double alpha_f) {
+Eigen::VectorXd truncatedGradient(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double alpha_lb, double alpha_ub, double alpha_f) {
     //The code assumes as invariant that the dimension of f and A match and that y = Poisson(|Af|^2), i.e. the standard phase retrieval setup.
     int n = A.cols();
     int m = A.rows();
@@ -43,9 +43,22 @@ py::array_t<double> truncatedGradient(Eigen::VectorXd f, Eigen::VectorXd y, RowM
             result += scalar * A.row(ix);
         }
     }
-    return py::array_t<double>(result.size(), result.data());
+    return result;
+}
+
+Eigen::VectorXd truncGradientDescent(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double mu, int maxIter, double eps, double alpha_lb, double alpha_ub, double alpha_f) {
+    int m = A.rows();
+    for(size_t ix = 0; ix < maxIter; ix++) {
+        Eigen::VectorXd grad = truncatedGradient(f, y, A, alpha_lb, alpha_ub, alpha_f);
+        f = f - (mu / m) * grad;
+        if(std::sqrt(grad.dot(grad)) < eps) {
+            break;
+        }
+    }
+    return f;
 }
 
 PYBIND11_MODULE(truncatedwf, m) {
     m.def("truncatedGradient", &truncatedGradient);
+    m.def("truncGradientDescent", &truncGradientDescent);
 }
