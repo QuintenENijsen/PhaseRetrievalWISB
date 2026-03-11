@@ -2,11 +2,32 @@
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
 #include <Eigen/Dense>
+#include <Eigen/Core>
 #include <cmath>
 
 namespace py = pybind11;
 
 using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+double truncInitFilter(double y_i, double lambda_0_sq, double alpha_f_sq) {
+    if(std::abs(y_i) <= lambda_0_sq * alpha_f_sq) {
+        return y_i;
+    } 
+    return 0;
+}
+
+Eigen::VectorXd truncSpectralInit(Eigen::VectorXd y, RowMatrixXd A, double alpha_f) {
+    int n = A.cols();
+    int m = A.rows();
+    double alpha_f_sq = std::pow(alpha_f, 2);
+
+    double lamba_0_sq = y.sum() / m;
+    Eigen::VectorXd condY = y.unaryexpr(std::ptr_fun(truncInitFilter));
+
+    RowMatrixXd Y = RowMatrixXd::Zero(n ,n);
+
+    return y; //Placeholder.
+}
 
 bool inE1(Eigen::VectorXd f, Eigen::VectorXd a_i, double alpha_lb, double alpha_ub, int n) {
     double v1 = (std::sqrt(n) / (std::sqrt(a_i.dot(a_i)))) * (std::abs(a_i.dot(f)) / std::sqrt(f.dot(f)));
