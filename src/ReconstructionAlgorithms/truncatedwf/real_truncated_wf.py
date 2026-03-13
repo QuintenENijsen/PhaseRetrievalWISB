@@ -7,7 +7,7 @@ import numpy as np
 from numpy import linalg as la
 import numpy.typing as npt
 import math
-from src.Plotting.plotting import plot_heat_map
+from src.Plotting.plotting import plot_heat_map_norm
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent
@@ -53,13 +53,14 @@ def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
     range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
     return minimizer, error, range_
 
-def compute_for_nm(n_m, norm_f0):
-    n = n_m[0]
-    m_ratio = n_m[1]
+def compute_for_nm(norm_oversampling):
+    n = 32
+    #n = n_m[0]
+    m_ratio = norm_oversampling[1]
 
     m = m_ratio * n
-    ground_truth = generate_gaussian_vector(n) * norm_f0
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(1, 50)]
+    ground_truth = generate_gaussian_vector(n) * norm_oversampling[0]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(1, 30)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     results = [compute_min_errors_ranges(mm, meas, n, m, ground_truth)
@@ -68,25 +69,26 @@ def compute_for_nm(n_m, norm_f0):
     minimizers, errors, ranges = zip(*results)
     minrange, maxrange = zip(*ranges)
 
-    avg_error = sum(errors) / len(errors)
+    avg_error = sum(errors) / (norm_oversampling[0] * len(errors))     #Only relative error
     avg_maxrange = min(50, sum(maxrange) / len(maxrange))
 
-    print(str(n) + ", " + str(m_ratio) + " completed.")
-    return n, m_ratio, avg_error, avg_maxrange
+    print(str(norm_oversampling[0]) + ", " + str(m_ratio) + " completed.")
+    return norm_oversampling[0], m_ratio, avg_error, avg_maxrange
 
 def run_average_sim():
-    ns = [5, 10, 15, 20]# 45, 50]
-    oversampling_ratios = [2,4,6,8]  # your ms list
+    #ns = [5, 10, 15, 20]# 45, 50]
+    norms = [1e-2, 5e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1, 1.5, 2, 3]
+    oversampling_ratios = [2,4,6,8,10,12,14,16,18,20]  # your ms list
 
-    jobs = list(product(ns, oversampling_ratios))
+    jobs = list(product(norms, oversampling_ratios))
 
     with ProcessPoolExecutor() as executor:
-        all_results = list(executor.map(compute_for_nm, jobs, [norm_f0 for x in range(len(jobs))]))
+        all_results = list(executor.map(compute_for_nm, jobs))
 
     print(all_results)
 
-    errors_across_n = {n: [] for n in ns}
-    maxranges_across_n = {n: [] for n in ns}
+    errors_across_n = {n: [] for n in norms}
+    maxranges_across_n = {n: [] for n in norms}
 
     for n, m_ratio, avg_error, avg_maxrange in all_results:
         errors_across_n[n].append(avg_error)
@@ -96,12 +98,12 @@ def run_average_sim():
 
     error_matrix = np.array([
         [error_lookup[(n, m)] for m in oversampling_ratios]
-        for n in ns
+        for n in norms
     ])
 
     print(error_matrix)
 
-    plot_heat_map(ns, oversampling_ratios, error_matrix, norm_f0)
+    plot_heat_map_norm(norms, oversampling_ratios, error_matrix, norms[len(norms)-1])
 
 if __name__ == "__main__":
     run_average_sim()

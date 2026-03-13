@@ -27,7 +27,7 @@ def plot_heat_map(ns, ms, error_matrix, norm_f0):
         vmin=0,
         vmax=norm_f0,
         cbar_kws={
-            "label": "Reconstruction Error",
+            "label": "Relative reconstruction Error",
             "extend": "max"
     })
 
@@ -37,6 +37,38 @@ def plot_heat_map(ns, ms, error_matrix, norm_f0):
     plt.tight_layout()
     plt.show()
 
+def plot_heat_map_norm(norms, ms, error_matrix, norm_f0):
+    df = pd.DataFrame(error_matrix, index=norms, columns=ms)
+    #Flips axis
+    df = df.iloc[::-1]
+
+    sns.set_theme(style="white")
+    plt.rcParams.update({
+        "font.size": 12,
+        "axes.labelsize": 13,
+        "axes.titlesize": 14,
+        "figure.dpi": 300
+    })
+
+    color_map = cm.get_cmap("viridis_r").copy()
+    color_map.set_over("darkred")
+
+    plt.figure(figsize=(8,6))
+    sns.heatmap(
+        df,
+        cmap=color_map,
+        vmin=0,
+        vmax=1.2,
+        cbar_kws={
+            "label": "Relative reconstruction Error",
+            "extend": "max"
+    })
+
+    plt.xlabel("Oversampling ratio (m/n)")
+    plt.ylabel("Signal intensity (|f_0|)")
+
+    plt.tight_layout()
+    plt.show()
 
 def plot_errors(errors: list[float]):
     plt.hist(errors, bins=200)
