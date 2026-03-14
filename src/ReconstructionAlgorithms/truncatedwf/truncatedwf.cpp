@@ -15,7 +15,7 @@ double truncInitFilter(double y_i, double lambda_0_sq, double alpha_f_sq) {
     } 
     return 0;
 }
-
+/*
 Eigen::VectorXd truncSpectralInit(Eigen::VectorXd y, RowMatrixXd A, double alpha_f) {
     int n = A.cols();
     int m = A.rows();
@@ -28,10 +28,9 @@ Eigen::VectorXd truncSpectralInit(Eigen::VectorXd y, RowMatrixXd A, double alpha
 
     return y; //Placeholder.
 }
-
-bool inE1(Eigen::VectorXd f, Eigen::VectorXd a_i, double alpha_lb, double alpha_ub, int n) {
-    double v1 = (std::sqrt(n) / (std::sqrt(a_i.dot(a_i)))) * (std::abs(a_i.dot(f)) / std::sqrt(f.dot(f)));
-    return (alpha_lb <= v1) && (v1 <= alpha_ub);
+*/
+bool inE1(double conditionRatio, double alpha_lb, double alpha_ub, int n) {
+    return (alpha_lb <= conditionRatio) && (conditionRatio <= alpha_ub);
 }
 
 double calcKt(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, int m) {
@@ -43,12 +42,10 @@ double calcKt(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, int m) {
     return sum / m;
 }
 
-bool inE2(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double alpha_f, int n, int m, int i) {
-    Eigen::VectorXd a_i = A.row(i);
-
+bool inE2(Eigen::VectorXd f, Eigen::VectorXd y, Eigen::VectorXd a_i, double alpha_f, double conditionRatio, int i, double Kt) {
     double lhs = std::abs(y[i] - std::pow(a_i.dot(f), 2));
 
-    double rhs = alpha_f * calcKt(f, y, A, m) * (std::sqrt(n) / (std::sqrt(a_i.dot(a_i)))) * (std::abs(a_i.dot(f)) / std::sqrt(f.dot(f)));
+    double rhs = alpha_f * Kt * conditionRatio;
     return lhs <= rhs;
 }
 
@@ -57,10 +54,14 @@ Eigen::VectorXd truncatedGradient(Eigen::VectorXd f, Eigen::VectorXd y, RowMatri
     int n = A.cols();
     int m = A.rows();
 
+    double Kt = calcKt(f, y, A, m);
     Eigen::VectorXd result = Eigen::VectorXd::Zero(A.cols());
     for(size_t ix = 0; ix < A.rows(); ix++) {
-        if(inE1(f, A.row(ix), alpha_lb, alpha_ub, n) && inE2(f, y, A, alpha_f, n, m, ix)) {
-            double scalar = (std::pow(std::abs(A.row(ix).dot(f)), 2) - y[ix]) / f.dot(A.row(ix));
+        Eigen::VectorXd a_i = A.row(ix);
+        double conditionRatio = (std::sqrt(static_cast<float>(n) / a_i.dot(a_i))) * (std::abs(a_i.dot(f)) / f.norm());
+        if(inE1(conditionRatio, alpha_lb, alpha_ub, n) && inE2(f, y, a_i, alpha_f, conditionRatio, ix, Kt)) {
+            double ai_dot_f = a_i.dot(f);
+            double scalar = (ai_dot_f * ai_dot_f - y[ix]) / ai_dot_f;
             result += scalar * A.row(ix);
         }
     }
@@ -69,10 +70,12 @@ Eigen::VectorXd truncatedGradient(Eigen::VectorXd f, Eigen::VectorXd y, RowMatri
 
 Eigen::VectorXd truncGradientDescent(Eigen::VectorXd f, Eigen::VectorXd y, RowMatrixXd A, double mu, int maxIter, double eps, double alpha_lb, double alpha_ub, double alpha_f) {
     int m = A.rows();
+    double stepSize = mu/m;
+
     for(size_t ix = 0; ix < maxIter; ix++) {
         Eigen::VectorXd grad = truncatedGradient(f, y, A, alpha_lb, alpha_ub, alpha_f);
-        f = f - (mu / m) * grad;
-        if(std::sqrt(grad.dot(grad)) < eps) {
+        f = f - stepSize * grad;
+        if(grad.dot(grad) < eps) {
             break;
         }
     }

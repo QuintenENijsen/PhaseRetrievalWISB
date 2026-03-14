@@ -12,9 +12,11 @@ from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent
 
+import cProfile
+import pstats
 
-eps = 1e-05
-MAX_ITER = 10_000
+eps = 1e-08
+MAX_ITER = 15_000
 norm_f0 = 100
 
 #Fake values
@@ -60,7 +62,7 @@ def compute_for_nm(norm_oversampling):
 
     m = m_ratio * n
     ground_truth = generate_gaussian_vector(n) * norm_oversampling[0]
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(1, 30)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 30)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     results = [compute_min_errors_ranges(mm, meas, n, m, ground_truth)
@@ -69,7 +71,7 @@ def compute_for_nm(norm_oversampling):
     minimizers, errors, ranges = zip(*results)
     minrange, maxrange = zip(*ranges)
 
-    avg_error = sum(errors) / (norm_oversampling[0] * len(errors))     #Only relative error
+    avg_error = sum(errors) / ((norm_oversampling[0]) * len(errors))     #Only relative error
     avg_maxrange = min(50, sum(maxrange) / len(maxrange))
 
     print(str(norm_oversampling[0]) + ", " + str(m_ratio) + " completed.")
@@ -77,22 +79,21 @@ def compute_for_nm(norm_oversampling):
 
 def run_average_sim():
     #ns = [5, 10, 15, 20]# 45, 50]
-    norms = [1e-2, 5e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1, 1.5, 2, 3]
-    oversampling_ratios = [2,4,6,8,10,12,14,16,18,20]  # your ms list
+    norms = [5e-3, 1e-2, 3e-2, 5e-2, 7e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1]
+    oversampling_ratios = [8, 10, 12, 14, 16, 18, 20, 25, 30]  # your ms list
 
     jobs = list(product(norms, oversampling_ratios))
 
     with ProcessPoolExecutor() as executor:
         all_results = list(executor.map(compute_for_nm, jobs))
-
     print(all_results)
 
     errors_across_n = {n: [] for n in norms}
-    maxranges_across_n = {n: [] for n in norms}
+    #maxranges_across_n = {n: [] for n in norms}
 
     for n, m_ratio, avg_error, avg_maxrange in all_results:
         errors_across_n[n].append(avg_error)
-        maxranges_across_n[n].append(avg_maxrange)
+        #maxranges_across_n[n].append(avg_maxrange)
 
     error_lookup = {(n, m): err for n, m, err, _ in all_results}
 
@@ -104,6 +105,15 @@ def run_average_sim():
     print(error_matrix)
 
     plot_heat_map_norm(norms, oversampling_ratios, error_matrix, norms[len(norms)-1])
+
+#profiler = cProfile.Profile()
+#profiler.enable()
+#run_average_sim()
+#profiler.disable()
+
+#stats = pstats.Stats(profiler)
+#stats.sort_stats('cumulative')
+#stats.print_stats(20)
 
 if __name__ == "__main__":
     run_average_sim()
