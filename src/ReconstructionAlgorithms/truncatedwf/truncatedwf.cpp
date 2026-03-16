@@ -29,6 +29,25 @@ Eigen::VectorXd truncSpectralInit(Eigen::VectorXd y, RowMatrixXd A, double alpha
     return y; //Placeholder.
 }
 */
+
+std::tuple<int, int> truncCountingSpectralInit(Eigen::VectorXd y, double alpha_f, int n, int m) {
+    double lambda_0_sq = y.sum() / m;
+    double alpha_f_sq = std::pow(alpha_f, 2);
+
+    int nonZeroCount = 0;
+    int truncatedCount = 0; 
+
+    for(size_t ix = 0; ix < y.size(); ix++) {
+        if(y[ix] != 0) {
+            nonZeroCount += 1;
+            if(std::abs(y[ix]) > alpha_f_sq * lambda_0_sq) {
+                truncatedCount += 1;
+            }
+        }
+    }
+    return std::make_tuple(truncatedCount, nonZeroCount);
+}
+
 bool inE1(double conditionRatio, double alpha_lb, double alpha_ub, int n) {
     return (alpha_lb <= conditionRatio) && (conditionRatio <= alpha_ub);
 }
@@ -85,4 +104,5 @@ Eigen::VectorXd truncGradientDescent(Eigen::VectorXd f, Eigen::VectorXd y, RowMa
 PYBIND11_MODULE(truncatedwf, m) {
     m.def("truncatedGradient", &truncatedGradient);
     m.def("truncGradientDescent", &truncGradientDescent);
+    m.def("truncCountingSpectralInit", &truncCountingSpectralInit);
 }

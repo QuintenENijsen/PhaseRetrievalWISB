@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Lage intensiteit gefixed.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="C++ geoptimaliseerd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/truncatedwf.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/truncatedwf.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/truncatedwf.so" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/truncatedwf.so" afterDir="false" />
@@ -211,7 +212,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773392063955</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="C++ geoptimaliseerd">
+      <option name="closed" value="true" />
+      <created>1773508539287</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1773508539287</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,7 +242,8 @@
     <MESSAGE value="Denk nog een keer goed na over de structuur, maybe C++ rewrite." />
     <MESSAGE value="Gradient descent of truncated wf in C++." />
     <MESSAGE value="Lage intensiteit gefixed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Lage intensiteit gefixed." />
+    <MESSAGE value="C++ geoptimaliseerd" />
+    <option name="LAST_COMMIT_MESSAGE" value="C++ geoptimaliseerd" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

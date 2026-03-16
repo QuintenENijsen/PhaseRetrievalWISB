@@ -7,22 +7,22 @@ import numpy as np
 from numpy import linalg as la
 import numpy.typing as npt
 import math
-from src.Plotting.plotting import plot_heat_map_norm
+from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncrate
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
-from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent
+from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
 
 import cProfile
 import pstats
 
-eps = 1e-08
+eps = 1e-30
 MAX_ITER = 15_000
 norm_f0 = 100
 
 #Fake values
-alpha_y = 5     #Paper states >= 3
-alpha_f_lb = 0.25     #Paper states should be 0 <= alpha <= 0.5
-alpha_f_ub = 7.5     #Paper states that >= 5
+alpha_y = 3     #Paper states >= 3
+alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
+alpha_f_ub = 5     #Paper states that >= 5
 
 def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int)-> npt.NDArray[np.float64]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
@@ -44,6 +44,20 @@ def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n
 
     return factor * lambda_0 * max_eigenvector
 
+def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> tuple[int, int]:
+    lambda_0: float = (np.sum(y.astype(np.float64))) / m
+
+    truncated_count = 0
+    non_zero_count = 0
+    for i in range (0, n):
+        if y[i] > 0:
+            non_zero_count += 1
+            if abs(y[i]) > alpha_y**2 * lambda_0**2:
+                truncated_count += 1
+
+
+    return truncated_count, non_zero_count
+
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
     f = trunc_spectral_init(A, y, n, m)
     mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
@@ -51,6 +65,7 @@ def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: 
 
 def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
     minimizer = gradient_descent(measurement_map, measurement, n, m)
+    print("Ground_truth: " + str(ground_truth) + ", Measurement: " + str(measurement) + ", Minimizer: " + str(minimizer))
     error = calculate_reconstruction_error(minimizer, ground_truth)
     range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
     return minimizer, error, range_
@@ -62,7 +77,7 @@ def compute_for_nm(norm_oversampling):
 
     m = m_ratio * n
     ground_truth = generate_gaussian_vector(n) * norm_oversampling[0]
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 30)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 1)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     results = [compute_min_errors_ranges(mm, meas, n, m, ground_truth)
@@ -80,7 +95,7 @@ def compute_for_nm(norm_oversampling):
 def run_average_sim():
     #ns = [5, 10, 15, 20]# 45, 50]
     norms = [5e-3, 1e-2, 3e-2, 5e-2, 7e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1]
-    oversampling_ratios = [8, 10, 12, 14, 16, 18, 20, 25, 30]  # your ms list
+    oversampling_ratios = [8]  # your ms list
 
     jobs = list(product(norms, oversampling_ratios))
 
@@ -106,6 +121,52 @@ def run_average_sim():
 
     plot_heat_map_norm(norms, oversampling_ratios, error_matrix, norms[len(norms)-1])
 
+def truncation_spectral_init(norms_alpha):
+    n = 32
+    oversampling_ratio = 10
+    m = oversampling_ratio * n
+
+    norm = norms_alpha[0]
+    alpha_f = norms_alpha[1]
+
+    ground_truth = generate_gaussian_vector(n) * norm
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
+    measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
+
+    results = [truncCountingSpectralInit(measured, alpha_f, n, m) for measured in measurements]
+
+    trunc_count, non_zero_count = zip(*results)
+    avg_trunc_count = sum(trunc_count) / len(trunc_count)
+    avg_non_zero_count = sum(non_zero_count) / len(non_zero_count)
+    avg_trunc_rate = avg_trunc_count / avg_non_zero_count
+
+    return norm, alpha_f, avg_trunc_rate
+
+def find_init_truncation_rate():
+    norms = [5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
+    alpha_fs = [3, 4, 5, 6, 7, 8, 9, 10]
+
+    jobs = list(product(norms, alpha_fs))
+
+    with ProcessPoolExecutor() as executor:
+        all_results = list(executor.map(truncation_spectral_init, jobs))
+
+    print(all_results)
+
+    count_across_norm = {n: [] for n in norms}
+
+    for norm, alpha_f, rate in all_results:
+        count_across_norm[norm].append(rate)
+
+    rate_lookup = {(norm, alpha_f): rate for norm, alpha_f, rate in all_results}
+
+    error_matrix = np.array([
+        [rate_lookup[(n, m)] for m in alpha_fs]
+        for n in norms
+    ])
+
+    plot_heat_map_truncrate(norms, alpha_fs, error_matrix)
+
 #profiler = cProfile.Profile()
 #profiler.enable()
 #run_average_sim()
@@ -116,4 +177,4 @@ def run_average_sim():
 #stats.print_stats(20)
 
 if __name__ == "__main__":
-    run_average_sim()
+  find_init_truncation_rate()
