@@ -24,14 +24,14 @@ alpha_y = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
 
-def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int)-> npt.NDArray[np.float64]:
+def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int, trunc: bool)-> npt.NDArray[np.float64]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
     factor: float = math.sqrt(m * n / (np.sum(np.linalg.norm(A, axis=1))))
 
     Y: npt.NDArray[np.float32] = np.zeros((n, n), dtype=np.float64)
 
     for i in range (0, n):
-        if abs(y[i]) > alpha_y**2 * lambda_0**2:
+        if trunc and abs(y[i]) > alpha_y**2 * lambda_0**2:
             continue
         a_i = np.ascontiguousarray(A[i])
         Y = Y + y[i] * (np.outer(a_i ,a_i))
@@ -59,13 +59,12 @@ def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> 
     return truncated_count, non_zero_count
 
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
-    f = trunc_spectral_init(A, y, n, m)
+    f = trunc_spectral_init(A, y, n, m, False)
     mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
     return truncGradientDescent(f, y, A, mu, MAX_ITER, eps, alpha_f_lb, alpha_f_ub, alpha_y);
 
 def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
     minimizer = gradient_descent(measurement_map, measurement, n, m)
-    print("Ground_truth: " + str(ground_truth) + ", Measurement: " + str(measurement) + ", Minimizer: " + str(minimizer))
     error = calculate_reconstruction_error(minimizer, ground_truth)
     range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
     return minimizer, error, range_
@@ -77,7 +76,7 @@ def compute_for_nm(norm_oversampling):
 
     m = m_ratio * n
     ground_truth = generate_gaussian_vector(n) * norm_oversampling[0]
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 1)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 30)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     results = [compute_min_errors_ranges(mm, meas, n, m, ground_truth)
@@ -95,7 +94,7 @@ def compute_for_nm(norm_oversampling):
 def run_average_sim():
     #ns = [5, 10, 15, 20]# 45, 50]
     norms = [5e-3, 1e-2, 3e-2, 5e-2, 7e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1]
-    oversampling_ratios = [8]  # your ms list
+    oversampling_ratios = [2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 25, 30]  # your ms list
 
     jobs = list(product(norms, oversampling_ratios))
 
@@ -177,4 +176,4 @@ def find_init_truncation_rate():
 #stats.print_stats(20)
 
 if __name__ == "__main__":
-  find_init_truncation_rate()
+    run_average_sim()
