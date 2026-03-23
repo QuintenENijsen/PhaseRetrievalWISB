@@ -58,7 +58,7 @@ def plot_heat_map_norm(norms, ms, error_matrix, norm_f0):
         df,
         cmap=color_map,
         vmin=0,
-        vmax=norm_f0 * 1.2,
+        vmax=1.1,
         cbar_kws={
             "label": "Relative reconstruction Error",
             "extend": "max"

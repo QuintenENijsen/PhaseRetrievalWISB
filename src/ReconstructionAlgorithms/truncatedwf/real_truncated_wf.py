@@ -94,8 +94,8 @@ def compute_for_nm(norm_oversampling):
 
 def run_average_sim():
     #ns = [5, 10, 15, 20]# 45, 50]
-    norms = [1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1]
-    oversampling_ratios = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 30]  # your ms list
+    norms = [1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    oversampling_ratios = [14, 16, 18, 20, 22, 24, 30]  # your ms list
 
     jobs = list(product(norms, oversampling_ratios))
 
@@ -143,7 +143,7 @@ def truncation_spectral_init(norms_alpha):
     return norm, alpha_f, avg_trunc_rate
 
 def find_init_truncation_rate():
-    norms = [5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
+    norms = [ 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1]
     alpha_fs = [3, 4, 5, 6, 7, 8, 9, 10]
 
     jobs = list(product(norms, alpha_fs))
@@ -177,4 +177,4 @@ def find_init_truncation_rate():
 #stats.print_stats(20)
 
 if __name__ == "__main__":
-    run_average_sim()
+    find_init_truncation_rate()

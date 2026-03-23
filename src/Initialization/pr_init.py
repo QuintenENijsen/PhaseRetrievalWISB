@@ -11,19 +11,19 @@ from numba import njit
 def vector_norm(f: npt.NDArray[np.float64]) -> float:
     return math.sqrt(np.sum(np.square(f)))
 
-def generate_gaussian_vector(n: int) -> npt.NDArray[np.float64]:
+def generate_gaussian_vector(n: int, normalized=True) -> npt.NDArray[np.float64]:
     """
     :return: A vector of size n whose components are Gaussian distributed random variables, where the vector has norm 1 in the ell^2 norm.
     """
 
     rand_vec: npt.NDArray[np.float64] = np.array([rand.gauss(0, 1) for x in range(0, n)], dtype=np.float64)
     #Normalize the vector
-    norm_vec = la.norm(rand_vec)
+    norm_vec = la.norm(rand_vec) if normalized else 1
 
     return rand_vec * (1.0 / norm_vec)
 
 def generate_measurement_matrix(n: int, m: int) -> npt.NDArray[np.float64]:
-    return np.array([(10 * generate_gaussian_vector(n)) for x in range(0, m)])
+    return np.array([(generate_gaussian_vector(n, False)) for x in range(0, m)])
 
 def generate_measured(matrix: npt.NDArray[np.float64], f0: npt.NDArray[np.float64], m: int) -> npt.NDArray[np.float64]:
     """Generates the y in the poisson phase retrieval problem, using the matrix A and assuming mathcal{A} = |Af|^2"""
