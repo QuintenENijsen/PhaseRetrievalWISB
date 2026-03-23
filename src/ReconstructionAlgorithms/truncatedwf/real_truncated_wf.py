@@ -61,13 +61,14 @@ def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> 
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
     f = trunc_spectral_init(A, y, n, m, False)
     mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
-    return truncGradientDescent(f, y, A, mu, MAX_ITER, eps, alpha_f_lb, alpha_f_ub, alpha_y);
+    minimizer =  truncGradientDescent(f, y, A, mu, MAX_ITER, eps, alpha_f_lb, alpha_f_ub, alpha_y)
+    return minimizer
 
 def compute_min_errors_ranges(measurement_map, measurement, n, m, ground_truth):
     minimizer = gradient_descent(measurement_map, measurement, n, m)
     error = calculate_reconstruction_error(minimizer, ground_truth)
-    range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
-    return minimizer, error, range_
+    #range_ = calculate_range(measurement_map, ground_truth, minimizer, m)
+    return minimizer, error, (0,0)
 
 def compute_for_nm(norm_oversampling):
     n = 32
@@ -93,8 +94,8 @@ def compute_for_nm(norm_oversampling):
 
 def run_average_sim():
     #ns = [5, 10, 15, 20]# 45, 50]
-    norms = [5e-3, 1e-2, 3e-2, 5e-2, 7e-2, 1e-1, 3e-1, 5e-1, 7e-1, 1]
-    oversampling_ratios = [2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 25, 30]  # your ms list
+    norms = [1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1]
+    oversampling_ratios = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 30]  # your ms list
 
     jobs = list(product(norms, oversampling_ratios))
 

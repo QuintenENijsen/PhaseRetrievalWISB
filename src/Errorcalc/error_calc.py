@@ -5,7 +5,9 @@ import numpy.typing as npt
 from src.Initialization.pr_init import calculate_measurement
 
 def calculate_reconstruction_error(f: npt.NDArray[np.float64], f0: npt.NDArray[np.float64]) -> float:
-    return min(float(la.norm(f - f0)), float(la.norm(f + f0)))
+    error =min(float(la.norm(f - f0)), float(la.norm(f + f0)))
+    print(error)
+    return error
 
 def calculate_range(matrix: npt.NDArray[np.float64], f0: npt.NDArray[np.float64], f: npt.NDArray[np.float64], m: int) -> type[float, float]:
     """

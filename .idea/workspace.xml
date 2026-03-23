@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Added counting for the spectral init.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="kleine dingetjes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Errorcalc/error_calc.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Errorcalc/error_calc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Initialization/pr_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Initialization/pr_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -225,7 +227,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773688158674</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="kleine dingetjes">
+      <option name="closed" value="true" />
+      <created>1774106303902</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1774106303902</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,7 +259,8 @@
     <MESSAGE value="Lage intensiteit gefixed." />
     <MESSAGE value="C++ geoptimaliseerd" />
     <MESSAGE value="Added counting for the spectral init." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added counting for the spectral init." />
+    <MESSAGE value="kleine dingetjes" />
+    <option name="LAST_COMMIT_MESSAGE" value="kleine dingetjes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

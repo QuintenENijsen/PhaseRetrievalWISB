@@ -23,7 +23,7 @@ def generate_gaussian_vector(n: int) -> npt.NDArray[np.float64]:
     return rand_vec * (1.0 / norm_vec)
 
 def generate_measurement_matrix(n: int, m: int) -> npt.NDArray[np.float64]:
-    return np.array([generate_gaussian_vector(n) for x in range(0, m)])
+    return np.array([(10 * generate_gaussian_vector(n)) for x in range(0, m)])
 
 def generate_measured(matrix: npt.NDArray[np.float64], f0: npt.NDArray[np.float64], m: int) -> npt.NDArray[np.float64]:
     """Generates the y in the poisson phase retrieval problem, using the matrix A and assuming mathcal{A} = |Af|^2"""
