@@ -10,7 +10,7 @@ import math
 from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncrate
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
-from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
+#from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
 
 import cProfile
 import pstats
@@ -24,14 +24,14 @@ alpha_y = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
 
-def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int, trunc: bool)-> npt.NDArray[np.float64]:
+def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n: int, m: int, alpha_fs: int, trunc: bool)-> npt.NDArray[np.float64]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
-    factor: float = math.sqrt(m * n / (np.sum(np.linalg.norm(A, axis=1))))
+    factor: float = math.sqrt((m * n) / (np.sum(np.linalg.norm(A, axis=1))))
 
     Y: npt.NDArray[np.float32] = np.zeros((n, n), dtype=np.float64)
 
-    for i in range (0, n):
-        if trunc and abs(y[i]) > alpha_y**2 * lambda_0**2:
+    for i in range (0, m):
+        if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
             continue
         a_i = np.ascontiguousarray(A[i])
         Y = Y + y[i] * (np.outer(a_i ,a_i))
@@ -42,7 +42,7 @@ def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n
 
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
-    return factor * lambda_0 * max_eigenvector
+    return factor * math.sqrt(lambda_0) * max_eigenvector
 
 def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int, trunc:bool):
     lambda_0:
@@ -124,7 +124,7 @@ def run_average_sim():
 
     print(error_matrix)
 
-    plot_heat_map_norm(norms, oversampling_ratios, error_matrix, norms[len(norms)-1])
+    plot_heat_map_norm(norms, oversampling_ratios, error_matrix, 1)
 
 def truncation_spectral_init(norms_alpha):
     n = 32
@@ -147,14 +147,37 @@ def truncation_spectral_init(norms_alpha):
 
     return norm, alpha_f, avg_trunc_rate
 
-def find_init_truncation_rate():
-    norms = [ 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1]
-    alpha_fs = [3, 4, 5, 6, 7, 8, 9, 10]
+def calc_init_error(norm_alphas):
+    '''
+    Calculates the normalized reconstruction error from only the truncated spectral initialization.
+    :param norm: The norm of the ground truth vector
+    :param alpha_fs: The truncation parameter used during the spectral initialization
+    :return: The average error over 50 measurements of the truncated spectral initialization
+    '''
+    n = 32
+    m = 20 * n
+    norm = norm_alphas[0]
+    alpha_fs = norm_alphas[1]
+
+    ground_truth = generate_gaussian_vector(n) * norm
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
+    measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
+
+    inits = [trunc_spectral_init(A, y, n, m, alpha_fs, True) for A, y in zip(measurement_maps, measurements)]
+    errors = list(map(lambda init: calculate_reconstruction_error(init, ground_truth), inits))
+
+    print(str(norm_alphas) + " , Completed")
+    average = sum(errors) / len(errors)
+    return norm, alpha_fs, average / norm
+
+def find_init_error():
+    norms = [1e-2, 2e-2, 3e-2, 4e-2, 5e-2, 6e-2, 7e-2, 8e-2, 9e-2, 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 2, 3, 5, 7, 10, 20, 50, 100]
+    alpha_fs = [3, 4, 5, 6, 7, 8, 9, 10, 1000]
 
     jobs = list(product(norms, alpha_fs))
 
     with ProcessPoolExecutor() as executor:
-        all_results = list(executor.map(truncation_spectral_init, jobs))
+        all_results = list(executor.map(calc_init_error, jobs))
 
     print(all_results)
 
@@ -163,14 +186,14 @@ def find_init_truncation_rate():
     for norm, alpha_f, rate in all_results:
         count_across_norm[norm].append(rate)
 
-    rate_lookup = {(norm, alpha_f): rate for norm, alpha_f, rate in all_results}
+    rate_lookup = {(norm, alpha_f): error for norm, alpha_f, error in all_results}
 
     error_matrix = np.array([
         [rate_lookup[(n, m)] for m in alpha_fs]
         for n in norms
     ])
 
-    plot_heat_map_truncrate(norms, alpha_fs, error_matrix)
+    plot_heat_map_norm(norms, alpha_fs, error_matrix, 2.5)
 
 #profiler = cProfile.Profile()
 #profiler.enable()
@@ -182,4 +205,4 @@ def find_init_truncation_rate():
 #stats.print_stats(20)
 
 if __name__ == "__main__":
-    find_init_truncation_rate()
+    find_init_error()
