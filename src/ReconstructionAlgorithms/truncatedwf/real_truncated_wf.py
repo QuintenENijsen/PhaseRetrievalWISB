@@ -44,6 +44,11 @@ def trunc_spectral_init(A: npt.NDArray[np.float64],y: npt.NDArray[np.float64], n
 
     return factor * lambda_0 * max_eigenvector
 
+def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int, trunc:bool):
+    lambda_0:
+    pass
+
+
 def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> tuple[int, int]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
 
