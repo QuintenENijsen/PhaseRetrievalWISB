@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="idk">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Merge branch 'master' of https://github.com/QuintenENijsen/PhaseRetrievalWISB&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Initialization/pr_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Initialization/pr_init.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -243,7 +241,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774256689992</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Merge branch 'master' of https://github.com/QuintenENijsen/PhaseRetrievalWISB&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+      <option name="closed" value="true" />
+      <created>1774537925509</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1774537925509</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
