@@ -47,7 +47,9 @@ def plot_heat_map_norm(norms, ms, error_matrix, norm_f0):
         "font.size": 12,
         "axes.labelsize": 13,
         "axes.titlesize": 14,
-        "figure.dpi": 300
+        "figure.dpi": 300,
+        "text.usetex": True,
+        "font.family": "Serif",
     })
 
     color_map = cm.get_cmap("viridis_r").copy()
@@ -60,12 +62,12 @@ def plot_heat_map_norm(norms, ms, error_matrix, norm_f0):
         vmin=0,
         vmax=norm_f0 * 1.1,
         cbar_kws={
-            "label": "Relative reconstruction Error",
-            "extend": "max"
+            "label": r"Relative reconstruction Error",
+            "extend": r"max"
     })
 
-    plt.xlabel("Oversampling ratio (m/n)")
-    plt.ylabel("Signal intensity (|f_0|)")
+    plt.xlabel(r"Oversampling ratio $\frac{m}{n}$")
+    plt.ylabel(r"Signal intensity $|f_0|$")
 
     plt.tight_layout()
     plt.show()

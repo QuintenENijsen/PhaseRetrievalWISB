@@ -185,25 +185,25 @@ def calc_init_error(norm_alphas):
     :param alpha_fs: The truncation parameter used during the spectral initialization
     :return: The average error over 50 measurements of the truncated spectral initialization
     '''
-    n = 32
-    m = 20 * n
+    n = 24
     norm = norm_alphas[0]
-    alpha_fs = norm_alphas[1]
+    oversampling = norm_alphas[1]
+    m = oversampling * n
 
     ground_truth = generate_gaussian_vector(n) * norm
     measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
-    inits = [new_trunc_spectral_init(A, y, n, m, alpha_fs, True) for A, y in zip(measurement_maps, measurements)]
+    inits = [new_trunc_spectral_init(A, y, n, m, 3, True) for A, y in zip(measurement_maps, measurements)]
     errors = list(map(lambda init: calculate_reconstruction_error(init, ground_truth), inits))
 
     print(str(norm_alphas) + " , Completed")
     average = sum(errors) / len(errors)
-    return norm, alpha_fs, average / norm
+    return norm, oversampling, average / norm
 
 def find_init_error():
-    norms = [1e-2, 2e-2, 3e-2, 4e-2, 5e-2, 6e-2, 7e-2, 8e-2, 9e-2, 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 2, 3, 5, 7, 10, 20, 50, 100]
-    alpha_fs = [3, 4, 5, 6, 7, 8, 9, 10]
+    norms = [1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 2, 3, 5, 7, 10, 20, 50, 100]
+    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125, 150, 175, 200, 225, 250]
 
     jobs = list(product(norms, alpha_fs))
 
@@ -224,7 +224,7 @@ def find_init_error():
         for n in norms
     ])
 
-    plot_heat_map_norm(norms, alpha_fs, error_matrix, 2.5)
+    plot_heat_map_norm(norms, alpha_fs, error_matrix, 1)
 
 #profiler = cProfile.Profile()
 #profiler.enable()
