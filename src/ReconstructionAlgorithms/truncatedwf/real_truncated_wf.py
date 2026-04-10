@@ -50,15 +50,18 @@ def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float6
     Y: npt.NDArray[np.float64] = np.zeros((n,n), dtype=np.float64)
 
     for i in range(0, m):
-        if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
-            continue
+        val = min(y[i] - alpha_fs**2 * lambda_0, 709)
+        weigth = (1 - (math.exp(val) / (1+math.exp(val))))
+        #weigth = 1  #No truncation.
+        #if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
+        #    continue
         a_i = np.ascontiguousarray(A[i])
-        Y = Y + y[i] * (np.outer(a_i, a_i))
+        Y = Y + weigth * y[i] * (np.outer(a_i, a_i))
     Y = Y / m
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)
 
-    norm = (np.sum(eigenvalues) - eigenvalues[max_index]) / (n-1)
+    norm = max((np.sum(eigenvalues) - eigenvalues[max_index]) / (n-1), 0)
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
     return max_eigenvector * np.sqrt(norm)
@@ -202,8 +205,8 @@ def calc_init_error(norm_alphas):
     return norm, oversampling, average / norm
 
 def find_init_error():
-    norms = [1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1, 2, 3, 5, 7, 10, 20, 50, 100]
-    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125, 150, 175, 200, 225, 250]
+    norms = [8e-2, 9e-2, 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1]#, 2, 3, 5, 7, 10, 20, 50, 100]
+    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80]
 
     jobs = list(product(norms, alpha_fs))
 
