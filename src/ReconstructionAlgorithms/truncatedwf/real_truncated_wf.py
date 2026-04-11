@@ -52,11 +52,13 @@ def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float6
     for i in range(0, m):
         val = min(y[i] - alpha_fs**2 * lambda_0, 709)
         weigth = (1 - (math.exp(val) / (1+math.exp(val))))
+        #new_y = (y[i] -1) / (y[i]+1)
+        new_y = y[i]
         #weigth = 1  #No truncation.
-        #if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
-        #    continue
+        if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
+            continue
         a_i = np.ascontiguousarray(A[i])
-        Y = Y + weigth * y[i] * (np.outer(a_i, a_i))
+        Y = Y + new_y * (np.outer(a_i, a_i))
     Y = Y / m
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)
@@ -77,11 +79,15 @@ def new2_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float
         a_i = np.ascontiguousarray(A[i])
         Y = Y + y[i] * (np.outer(a_i, a_i))
     Y = Y / m
+
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)
+
+    norm = max((np.sum(eigenvalues) - eigenvalues[max_index]) / (n-1), 0)
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
-    return max_eigenvector * np.sqrt(lambda_0)
+    return max_eigenvector * np.sqrt(norm)
+
 
 def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> tuple[int, int]:
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
@@ -194,10 +200,10 @@ def calc_init_error(norm_alphas):
     m = oversampling * n
 
     ground_truth = generate_gaussian_vector(n) * norm
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,100)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
-    inits = [new_trunc_spectral_init(A, y, n, m, 3, True) for A, y in zip(measurement_maps, measurements)]
+    inits = [new_trunc_spectral_init(A, y, n, m, 3, False) for A, y in zip(measurement_maps, measurements)]
     errors = list(map(lambda init: calculate_reconstruction_error(init, ground_truth), inits))
 
     print(str(norm_alphas) + " , Completed")
@@ -206,7 +212,7 @@ def calc_init_error(norm_alphas):
 
 def find_init_error():
     norms = [8e-2, 9e-2, 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1]#, 2, 3, 5, 7, 10, 20, 50, 100]
-    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80]
+    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
     jobs = list(product(norms, alpha_fs))
 

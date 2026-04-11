@@ -186,3 +186,39 @@ def plot_average_sim(ns: list[int], ms: list[int], errors: list[list[float]]):
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
+    df = pd.DataFrame(error_matrix, index=ks, columns=ms)
+    #Flips axis
+    df = df.iloc[::-1]
+
+    sns.set_theme(style="white")
+    plt.rcParams.update({
+        "font.size": 12,
+        "axes.labelsize": 13,
+        "axes.titlesize": 14,
+        "figure.dpi": 300,
+        "text.usetex": True,
+        "font.family": "Serif",
+    })
+
+    color_map = cm.get_cmap("viridis_r").copy()
+    color_map.set_over("darkred")
+
+    plt.figure(figsize=(8,6))
+    sns.heatmap(
+        df,
+        cmap=color_map,
+        vmin=0,
+        vmax=1,
+        cbar_kws={
+            "label": r"Relative reconstruction Error",
+            "extend": "max"
+    })
+
+    plt.xlabel(r"Oversampling ratio $\frac{m}{n}$")
+    plt.ylabel(r"Generative model dimension $k$")
+
+    plt.tight_layout()
+    plt.show()
