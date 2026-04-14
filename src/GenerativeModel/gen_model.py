@@ -12,7 +12,7 @@ from src.Plotting.plotting import plot_heat_map_genmodel
 from src.ReconstructionAlgorithms.truncatedwf.real_truncated_wf import new_trunc_spectral_init
 
 
-device = torch.accelator.current_accelerator().type
+device = torch.accelerator.current_accelerator().type
 
 MAX_ITER: int = 1000
 alpha_fs = 3     #Paper states >= 3
@@ -33,14 +33,11 @@ class G_Model(nn.Module):
         return logits
 
 def G(model, X):
-    """
-    Defines the generative model used during reconstruction
-    :param x: The input vector of the generative model, lives in \R^d
-    :return: The value G(x) \in \R^n
-    """
+    if X.dim() == 1:
+        X = X.unsqueeze(0)
+
     logits = model(X)
-    pred_probab = nn.Softmax(dim=1)(logits)
-    return pred_probab.argmax(1)
+    return logits.squeeze(0)
 
 def freeze_model(model):
     for param in model.Parameters():
@@ -51,37 +48,41 @@ def z_step(model, z, f, lambda_, lr):
     if z.grad is not None:
         z.grad.zero_()
 
-    Gz = model(z)
+    Gz = G(model, z)
+    #print(Gz.grad_fn)
     loss = lambda_ * torch.norm(Gz - f.detach()) ** 2   #detach() may be wrong.
     #Update gradients of z
     loss.backward()
     with torch.no_grad():
-        z = z - lr * z.grad
+        z -= lr * z.grad
 
     return z
 
 def optimize_model(d: int, n: int, m: int, A: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-    model = G_Model.to(device)
-    freeze_model(model)
+    model = G_Model(d,n).to(device)
+    #freeze_model(model)
     mu = 0.2
     lambda_ = 1
     stepsize = mu / m
 
-    f = torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True))
-    z = torch.randn(d, requires_grad = True) #Zoek hier nog een daadwerkelijk goeie initializer voor.
+    f = torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True)).to(device)
+    z = torch.randn(d, requires_grad = True, device=device) #Zoek hier nog een daadwerkelijk goeie initializer voor.
     for _ in range(0, MAX_ITER):
         #We first do one iteration of optimzation for f, with fixed z.
         #For this we use Truncated wirtinger flow.
-        grad_f = truncatedGradient(f, y, A, alpha_f_lb, alpha_f_ub, alpha_fs) + 2 * (f - G(model, z))
-        f = f - stepsize * grad_f
-        z = z_step(model, z, f, lambda_, 0.1)
-        pass
+        f_numpy = f.detach().cpu().numpy()
 
-    return f.numpy()
+        grad_f = truncatedGradient(f_numpy, y, A, alpha_f_lb, alpha_f_ub, alpha_fs)
+        grad_f_torch = torch.from_numpy(grad_f).to(device) + 2 * (f - G(model, z))
+
+        f = f - stepsize * grad_f_torch
+        z = z_step(model, z, f, lambda_, 0.1)
+
+    return f.detach().cpu().numpy()
 
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 24
-    k = inputs[0]
+    d = inputs[0]
     oversampling = inputs[1]
     m = oversampling * n
 
@@ -90,23 +91,24 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
     measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,100)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
-    estimators = [optimize_model() for A, y in zip(measurement_maps, measurements)]
+    estimators = [optimize_model(d, n, m, A, y) for A, y in zip(measurement_maps, measurements)]
     errors = list(map(lambda estimate: calculate_reconstruction_error(estimate, ground_truth), estimators))
 
     print(str(inputs) + " , Completed")
     average = sum(errors) / (10 * len(errors))
 
-    return k, oversampling, average
+    return d, oversampling, average
 
 
 def run_simulation():
-     neural_net_dim = [5]
-     oversampling = [2, 4, 6, 8, 10, 15, 20, 25]
+     neural_net_dim = [6, 10, 14, 18]
+     oversampling = [4, 6, 8, 10]
 
      jobs = list(product(neural_net_dim, oversampling))
 
-     with ProcessPoolExecutor() as executor:
-         all_results = list(executor.map(calc_reconstruction_error, jobs))
+     all_results = list(map(calc_reconstruction_error, jobs))
+     #with ProcessPoolExecutor() as executor:
+     #    all_results = list(executor.map(calc_reconstruction_error, jobs))
 
      print(all_results)
 
@@ -124,5 +126,5 @@ def run_simulation():
 
      plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
 
-     pass
-
+if __name__ == "__main__":
+    run_simulation()

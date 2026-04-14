@@ -4,10 +4,8 @@ from numpy import linalg as la
 import numpy.typing as npt
 import random as rand
 import math
-from numba import njit
 
 
-@njit
 def vector_norm(f: npt.NDArray[np.float64]) -> float:
     return math.sqrt(np.sum(np.square(f)))
 

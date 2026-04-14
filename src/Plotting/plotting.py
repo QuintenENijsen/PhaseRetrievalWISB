@@ -199,8 +199,8 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
         "axes.labelsize": 13,
         "axes.titlesize": 14,
         "figure.dpi": 300,
-        "text.usetex": True,
-        "font.family": "Serif",
+        #"text.usetex": True,
+        #"font.family": "Serif",
     })
 
     color_map = cm.get_cmap("viridis_r").copy()
@@ -213,12 +213,12 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
         vmin=0,
         vmax=1,
         cbar_kws={
-            "label": r"Relative reconstruction Error",
+            "label": "Relative reconstruction Error",
             "extend": "max"
     })
 
-    plt.xlabel(r"Oversampling ratio $\frac{m}{n}$")
-    plt.ylabel(r"Generative model dimension $k$")
+    plt.xlabel("Oversampling ratio m/n")
+    plt.ylabel("Generative model dimension d")
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig("genmodel.png")
