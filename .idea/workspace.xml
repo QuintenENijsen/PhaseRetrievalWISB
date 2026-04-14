@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="New spectral init toegevoegd.">
-      <change afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PhaseRetrievalWISB.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Begin gemaakt aan gen model">
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_wirtinger_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_wirtinger_flow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -261,7 +260,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774540537616</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Begin gemaakt aan gen model">
+      <option name="closed" value="true" />
+      <created>1775929633656</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1775929633656</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,17 +295,7 @@
     <MESSAGE value="kleine dingetjes" />
     <MESSAGE value="idk" />
     <MESSAGE value="New spectral init toegevoegd." />
-    <option name="LAST_COMMIT_MESSAGE" value="New spectral init toegevoegd." />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/main.py</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Begin gemaakt aan gen model" />
+    <option name="LAST_COMMIT_MESSAGE" value="Begin gemaakt aan gen model" />
   </component>
 </project>

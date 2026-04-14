@@ -51,14 +51,10 @@ def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float6
 
     for i in range(0, m):
         val = min(y[i] - alpha_fs**2 * lambda_0, 709)
-        weigth = (1 - (math.exp(val) / (1+math.exp(val))))
-        #new_y = (y[i] -1) / (y[i]+1)
-        new_y = y[i]
-        #weigth = 1  #No truncation.
-        if trunc and abs(y[i]) > alpha_fs**2 * lambda_0:
-            continue
+        weight = (1 - (math.exp(val) / (1+math.exp(val))))
         a_i = np.ascontiguousarray(A[i])
-        Y = Y + new_y * (np.outer(a_i, a_i))
+        Y = Y + (weight * y[i]) * (np.outer(a_i, a_i))
+
     Y = Y / m
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)

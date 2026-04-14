@@ -6,8 +6,6 @@ import numpy.typing as npt
 import random as rand
 import math
 from concurrent.futures import ProcessPoolExecutor
-import matplotlib.pyplot as plt
-import seaborn as sns
 from itertools import product
 from src.Plotting.plotting import plot_heat_map
 from numba import njit
