@@ -14,7 +14,7 @@ from src.ReconstructionAlgorithms.truncatedwf.real_truncated_wf import new_trunc
 
 device = torch.accelerator.current_accelerator().type
 
-MAX_ITER: int = 1000
+MAX_ITER: int = 300
 alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
@@ -58,6 +58,33 @@ def z_step(model, z, f, lambda_, lr):
 
     return z
 
+def poisson_wirtinger_grad(A, f, y, alpha_fs):
+    eps = 1e-10
+    y = y.float()
+
+    inner = A @ f
+    intensities = inner ** 2
+
+    a_norms = torch.norm(A, dim=1)
+    f_norm = torch.norm(f)
+    normalized_amp = (A.shape[1] ** 0.5 * inner.abs()) / (a_norms * f_norm + eps)
+
+    mask1 = (normalized_amp >= alpha_f_lb) & (normalized_amp <= alpha_f_ub)
+
+    residuals = (y - intensities).abs()
+    K_t = residuals.mean()
+
+    mask2 = residuals <= alpha_fs * K_t * normalized_amp
+
+    mask = (mask1 & mask2).float()
+
+    valid = intensities > eps
+    weights = torch.where(valid, (1.0 - y / (intensities + eps)) * inner,
+                          torch.zeros_like(inner))
+    weights = weights * mask.float()
+
+    return A.T @ weights
+
 def optimize_model(d: int, n: int, m: int, A: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     model = G_Model(d,n).to(device)
     #freeze_model(model)
@@ -67,13 +94,12 @@ def optimize_model(d: int, n: int, m: int, A: npt.NDArray[np.float64], y: npt.ND
 
     f = torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True)).to(device)
     z = torch.randn(d, requires_grad = True, device=device) #Zoek hier nog een daadwerkelijk goeie initializer voor.
+    A = torch.from_numpy(A).to(device)
+    y = torch.from_numpy(y).to(device)
     for _ in range(0, MAX_ITER):
         #We first do one iteration of optimzation for f, with fixed z.
         #For this we use Truncated wirtinger flow.
-        f_numpy = f.detach().cpu().numpy()
-
-        grad_f = truncatedGradient(f_numpy, y, A, alpha_f_lb, alpha_f_ub, alpha_fs)
-        grad_f_torch = torch.from_numpy(grad_f).to(device) + 2 * (f - G(model, z))
+        grad_f_torch = poisson_wirtinger_grad(A, f, y, alpha_fs) + 2 * (f - G(model, z))
 
         f = f - stepsize * grad_f_torch
         z = z_step(model, z, f, lambda_, 0.1)
@@ -81,14 +107,14 @@ def optimize_model(d: int, n: int, m: int, A: npt.NDArray[np.float64], y: npt.ND
     return f.detach().cpu().numpy()
 
 def calc_reconstruction_error(inputs) -> (int, int, float):
-    n = 24
+    n = 64
     d = inputs[0]
     oversampling = inputs[1]
     m = oversampling * n
 
 
     ground_truth = generate_gaussian_vector(n) * 10
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,100)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 30)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     estimators = [optimize_model(d, n, m, A, y) for A, y in zip(measurement_maps, measurements)]
@@ -101,8 +127,8 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [6, 10, 14, 18]
-     oversampling = [4, 6, 8, 10]
+     neural_net_dim = [8, 16, 32, 48]
+     oversampling = [1, 2, 3, 4, 5, 6, 8, 10]
 
      jobs = list(product(neural_net_dim, oversampling))
 
