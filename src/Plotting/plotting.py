@@ -211,7 +211,7 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
         df,
         cmap=color_map,
         vmin=0,
-        vmax=1,
+        vmax=1.5,
         cbar_kws={
             "label": "Relative reconstruction Error",
             "extend": "max"
