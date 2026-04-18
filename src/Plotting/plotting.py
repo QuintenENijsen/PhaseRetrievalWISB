@@ -218,7 +218,7 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
     })
 
     plt.xlabel("Oversampling ratio m/n")
-    plt.ylabel("Generative model dimension d")
+    plt.ylabel("Latent dimension d")
 
     plt.tight_layout()
     plt.savefig("genmodel.png")
