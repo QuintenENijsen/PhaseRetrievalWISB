@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="PCA???">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Unlimited GPU powerrrr">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -307,14 +306,21 @@
       <option name="project" value="LOCAL" />
       <updated>1776523380370</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Unlimited GPU powerrrr">
+      <option name="closed" value="true" />
+      <created>1776531782032</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1776531782032</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Set-up to calculate all relevent details, no Wirtinger flow." />
     <MESSAGE value="Final before Wirtinger Flow." />
     <MESSAGE value="Wirtinger flow completed." />
     <MESSAGE value="Fixed small error." />
@@ -339,6 +345,7 @@
     <MESSAGE value="Eerste resultaten" />
     <MESSAGE value="Final working version with the pytorch neural net" />
     <MESSAGE value="PCA???" />
-    <option name="LAST_COMMIT_MESSAGE" value="PCA???" />
+    <MESSAGE value="Unlimited GPU powerrrr" />
+    <option name="LAST_COMMIT_MESSAGE" value="Unlimited GPU powerrrr" />
   </component>
 </project>

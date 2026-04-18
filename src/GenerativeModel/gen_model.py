@@ -29,6 +29,8 @@ alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
 
+validation_batch_size = 10
+
 #######################################################################################################################################
 #Small utility functions and initialization
 #######################################################################################################################################
@@ -240,13 +242,13 @@ def z_step_pca(mu, U, z, f, lambda_, lr):
 def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
     #model = G_Model(d,n).to(device)
     #freeze_model(model)
-    lambda_ = math.sqrt(n)
+    lambda_ = 1 #math.sqrt(n)
     stepsize = 0.2 / (lambda_ * m)
     z_lr = 0.1 / lambda_
 
-    f = torch.randn(10, n, requires_grad=False, device=device)
+    f = torch.randn(validation_batch_size, n, requires_grad=False, device=device)
         #torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True)).to(device)
-    z = torch.randn(10, d, requires_grad = True, device=device) #Zoek hier nog een daadwerkelijk goeie initializer voor.
+    z = torch.randn(validation_batch_size, d, requires_grad = True, device=device) #Zoek hier nog een daadwerkelijk goeie initializer voor.
 
     for _ in range(0, MAX_ITER):
         #We first do one iteration of optimzation for f, with fixed z.
@@ -280,7 +282,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
     errors = []
 
     for gt in ground_truths:
-        A = generate_measurement_matrix_gpu(n, m, 10)
+        A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
         estimators = optimize_model_pca(d, n, m, A, y, mu, U)
