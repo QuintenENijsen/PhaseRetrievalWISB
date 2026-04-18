@@ -1,4 +1,6 @@
 #Pytorch imports
+from importlib.metadata import requires
+
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Subset
@@ -22,10 +24,54 @@ import os
 #GPU detection.
 device = torch.accelerator.current_accelerator().type
 
-MAX_ITER: int = 300
+MAX_ITER: int = 800
 alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
+
+#######################################################################################################################################
+#Small utility function
+#######################################################################################################################################
+
+def torch_recon_error(f, f_0):
+    return min(torch.norm(f-f_0), torch.norm(f+f_0))
+
+#######################################################################################################################################
+# Data loading
+#######################################################################################################################################
+
+training_size = 10000
+validation_size = 10
+
+training_dataset = datasets.MNIST(
+    root="data",
+    train=True,
+    download=True,
+    transform=ToTensor()
+)
+
+training_indices = torch.randperm(len(training_dataset))[:training_size]
+training_data = Subset(training_dataset, training_indices)
+
+test_dataset = datasets.MNIST(
+    root="data",
+    train=False,
+    download=True,
+    transform=ToTensor()
+)
+
+test_indices = torch.randperm(len(test_dataset))[:validation_size]
+test_data = Subset(test_dataset, test_indices)
+
+train_dataloader = DataLoader(training_data, batch_size=64)
+test_dataloader = DataLoader(test_data, batch_size=validation_size)
+
+def flatten_data(dataloader):
+    X = []
+    for images, _ in dataloader:
+        images = images.view(images.size(0), -1)
+        X.append(images)
+    return torch.cat(X, dim=0)
 
 #######################################################################################################################################
 #Defining the generative model plus accessory functions
@@ -55,63 +101,8 @@ def freeze_model(model):
     for param in model.parameters():
         param.requires_grad = False
 
-
 #######################################################################################################################################
-# Data loading
-#######################################################################################################################################
-
-training_size = 10000
-validation_size = 100
-
-training_dataset = datasets.MNIST(
-    root="data",
-    train=True,
-    download=True,
-    transform=ToTensor()
-)
-
-training_data = torch.randperm(len(training_dataset))[:training_size]
-
-test_dataset = datasets.MNIST(
-    root="data",
-    train=False,
-    download=True,
-    transform=ToTensor()
-)
-
-test_data = torch.randperm(len(test_dataset))[:validation_size]
-
-train_dataloader = DataLoader(training_data, batch_size=64)
-test_dataloader = DataLoader(test_data, batch_size=64)
-
-def flatten_data(dataloader):
-    X = []
-    for images, _ in dataloader:
-        images = images.view(images.size(0), -1)
-        X.append(images)
-    return torch.cat(X, dim=0)
-
-def compute_pca(X, n, d):
-    """
-    Computes the PCA matrix for data matrix X, with embedding dimension k.
-    :param X: Data list
-    :param k: Embedding dimension
-    :param d: Latent dimension
-    :return: A tuple with the bias and the PCA matrix
-    """
-    mu = X.mean(dim=0, keepdim=True)
-    X_centered = X - mu
-
-    U, S, Vt = torch.linalg.svd(X_centered, full_matrices=False)
-
-    components = Vt[:n]
-    return mu, components
-
-def G_pca(mu, U, z):
-    return mu + U @ z
-
-#######################################################################################################################################
-#Calculating reconstruction error
+#Calculating reconstruction error for the pytorch neural network implementation
 #######################################################################################################################################
 
 def z_step(model, z, f, lambda_, lr):
@@ -131,7 +122,6 @@ def z_step(model, z, f, lambda_, lr):
 
 def poisson_wirtinger_grad(A, f, y, alpha_fs):
     eps = 1e-10
-    y = y.float()
 
     inner = A @ f
     intensities = inner ** 2
@@ -179,32 +169,128 @@ def optimize_model(d: int, n: int, m: int, A: npt.NDArray[np.float64], y: npt.ND
 
     return f.detach().cpu().numpy()
 
+#######################################################################################################################################
+#Definition of the PCA model.
+#######################################################################################################################################
+
+def compute_pca(X, d):
+    """
+    Computes the PCA matrix for data matrix X, with embedding dimension k.
+    :param X: Data list
+    :param k: Embedding dimension
+    :param d: Latent dimension
+    :return: A tuple with the PCA matrix and the bias
+    """
+    mu = X.mean(dim=0, keepdim=True)
+    X_centered = X - mu
+
+    U, S, Vt = torch.linalg.svd(X_centered, full_matrices=False)
+
+    components = Vt[:d]
+    return components, mu
+
+def G_pca(mu, U, z):
+    return mu + U @ z
+
+#######################################################################################################################################
+#Calculating reconstruction error for the PCA implementation
+#######################################################################################################################################
+
+
+def z_step_pca(mu, U, z, f, lambda_, lr):
+    #Sets all previously computed gradients to 0
+    if z.grad is not None:
+        z.grad.zero_()
+
+    Gz = G_pca(mu, U, z)
+    #print(Gz.grad_fn)
+    loss = torch.norm(Gz - f.detach()) ** 2   #detach() may be wrong.
+    #Update gradients of z
+    loss.backward()
+    with torch.no_grad():
+        z -= lr * lambda_ * z.grad
+
+    return z.detach().requires_grad_(True)
+
+def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
+    #model = G_Model(d,n).to(device)
+    #freeze_model(model)
+    lambda_ = 5 * math.sqrt(d)
+    stepsize = 0.2 / (lambda_ * m)
+    z_lr = 0.1 / lambda_
+
+    f = torch.randn(n, requires_grad=True, device=device)
+        #torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True)).to(device)
+    z = torch.randn(d, requires_grad = True, device=device) #Zoek hier nog een daadwerkelijk goeie initializer voor.
+
+    for _ in range(0, MAX_ITER):
+        #We first do one iteration of optimzation for f, with fixed z.
+        #For this we use Truncated wirtinger flow.
+        grad_f_torch = poisson_wirtinger_grad(A, f, y, alpha_fs) + 2 * lambda_ * (f - G_pca(mu, U, z))
+
+        f = f - stepsize * grad_f_torch
+        z = z_step_pca(mu, U, z, f, lambda_, z_lr)
+
+    return f
+
+#######################################################################################################################################
+#Utility/Caller functions to generate statistics on the reconstruction error
+#######################################################################################################################################
+
 def calc_reconstruction_error(inputs) -> (int, int, float):
-    n = 128
+    n = 784
     d = inputs[0][0]
-    model = inputs[0][1]
-    model.to(device)
-    freeze_model(model)
+    components, mu = inputs[0][1]
+
+    U = components.T.to(device=device, dtype=torch.float32)
+    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+
     oversampling = inputs[1]
     m = oversampling * n
 
-    ground_truth = generate_gaussian_vector(n) * 100
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0, 50)]
-    measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
+    images, _ = next(iter(test_dataloader))
+    images = images.view(images.size(0), -1)
+    ground_truths = images.to(device=device, dtype=torch.float32)
 
-    estimators = [optimize_model(d, n, m, A, y, model) for A, y in zip(measurement_maps, measurements)]
-    errors = list(map(lambda estimate: calculate_reconstruction_error(estimate, ground_truth), estimators))
+    errors = []
 
-    average = sum(errors) / (100 * len(errors))
+    for gt in ground_truths:
+        measurement_maps_np = [generate_measurement_matrix(n, m) for _ in range(10)]
+        gt_np = gt.cpu().numpy()
+        measurements_np = [generate_measured(M, gt_np, m) for M in measurement_maps_np]
+
+        # Convert to GPU tensors once
+        measurement_maps = [
+            torch.from_numpy(M).to(device=device, dtype=torch.float32)
+            for M in measurement_maps_np
+        ]
+        measurements = [
+            torch.from_numpy(y).to(device=device, dtype=torch.float32)
+            for y in measurements_np
+        ]
+
+        estimators = [
+            optimize_model_pca(d, n, m, A, y, mu, U) for A, y in zip(measurement_maps, measurements)
+        ]
+        errs = [(torch_recon_error(f ,gt) / torch.norm(gt)) for f in estimators]
+        errors.extend(errs)
+
+    errors = [err.item() for err in errors]
+
+    average = sum(errors) / len(errors)
 
     print(str(inputs[0][0]) +"," + str(inputs[1]) + " , Completed " + ", Average: " + str(average))
     return d, oversampling, average
 
 
 def run_simulation():
-     neural_net_dim = [8, 16, 32, 48, 64, 80, 96, 112, 128]
-     models = [G_Model(d, 128) for d in neural_net_dim]
-     oversampling = [1, 2, 3, 4, 5, 6, 7, 8]
+     neural_net_dim = [ 28, 56, 112, 224, 448, 672]
+     X_train = flatten_data(train_dataloader).to(device)
+     components, mu = compute_pca(X_train, 768)
+     models = [(components[:d], mu) for d in neural_net_dim]
+     oversampling = [2, 3, 4, 5, 6]
+
+     "Starting reconstruction"
 
      jobs = list(product(zip(neural_net_dim, models), oversampling))
 
