@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="nog wat gerund.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Zieke plaatjes + nieuwe estimator.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
@@ -322,14 +322,21 @@
       <option name="project" value="LOCAL" />
       <updated>1776534213926</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Zieke plaatjes + nieuwe estimator.">
+      <option name="closed" value="true" />
+      <created>1776691000652</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1776691000652</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Wirtinger flow completed." />
     <MESSAGE value="Fixed small error." />
     <MESSAGE value="Model werkt, goofy aah resultaten tho." />
     <MESSAGE value="Laatste veranderingen toegevoegd." />
@@ -354,6 +361,7 @@
     <MESSAGE value="PCA???" />
     <MESSAGE value="Unlimited GPU powerrrr" />
     <MESSAGE value="nog wat gerund." />
-    <option name="LAST_COMMIT_MESSAGE" value="nog wat gerund." />
+    <MESSAGE value="Zieke plaatjes + nieuwe estimator." />
+    <option name="LAST_COMMIT_MESSAGE" value="Zieke plaatjes + nieuwe estimator." />
   </component>
 </project>

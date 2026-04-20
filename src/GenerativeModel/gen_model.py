@@ -2,7 +2,7 @@
 from importlib.metadata import requires
 
 import torch
-from torch import nn
+from torch import nn, optim
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets
 from torchvision.transforms import ToTensor
@@ -29,7 +29,7 @@ alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
 
-validation_batch_size = 10
+validation_batch_size = 20
 
 #######################################################################################################################################
 #Small utility functions and initialization
@@ -50,7 +50,7 @@ def generate_measurement_gpu(A, f_0):
 # Data loading
 #######################################################################################################################################
 
-training_size = 15000
+training_size = 100000
 validation_size = 10
 
 training_dataset = datasets.MNIST(
@@ -73,7 +73,13 @@ test_dataset = datasets.MNIST(
 test_indices = torch.randperm(len(test_dataset))[:validation_size]
 test_data = Subset(test_dataset, test_indices)
 
-train_dataloader = DataLoader(training_data, batch_size=64)
+train_dataloader = DataLoader(training_data,
+                              batch_size=128,
+                              num_workers=6,
+                              pin_memory=True,
+                              persistent_workers=True,
+                              prefetch_factor=4,
+                              )
 test_dataloader = DataLoader(test_data, batch_size=validation_size)
 
 def flatten_data(dataloader):
@@ -219,10 +225,8 @@ def G_pca(mu, U, z):
     return mu + U @ z
 
 #######################################################################################################################################
-#Calculating reconstruction error for the PCA implementation
+#Reconstruction for the PCA implementation
 #######################################################################################################################################
-
-
 
 def z_step_pca(mu, U, z, f, lambda_, lr):
     #Sets all previously computed gradients to 0
@@ -274,6 +278,71 @@ def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
         f ,z = update_formulation2(f, z, A, y, alpha_fs, mu, U, z_lr)
     z = mu + (U @ z.detach().unsqueeze(-1)).squeeze(-1)
     return z
+
+#######################################################################################################################################
+#Definition and training of a deep neural network implementation
+#######################################################################################################################################
+
+class AutoEncoder(nn.Module):
+    def __init__(self, d, n):
+        super(AutoEncoder, self).__init__()
+        self.flatten = nn.Flatten()
+        step = (n-d) // 4
+        hidden1 = n - step
+        hidden2 = n - 2 * step
+        hidden3 = n - 3 * step
+
+        self.encoder = nn.Sequential(
+            nn.Linear(n, hidden1),
+            nn.ReLU(),
+            nn.Linear(hidden1, hidden2),
+            nn.ReLU(),
+            nn.Linear(hidden2, hidden3),
+            nn.ReLU(),
+            nn.Linear(hidden3, d),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(d, hidden3),
+            nn.ReLU(),
+            nn.Linear(hidden3, hidden2),
+            nn.ReLU(),
+            nn.Linear(hidden2, hidden1),
+            nn.ReLU(),
+            nn.Linear(hidden1, n),
+            nn.Softplus(),
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+#Training parameters
+learning_rate = 1e-3
+epochs = 700
+
+def train_loop(dataloader, model, optimizer, loss_fn):
+    for epoch in range(epochs):
+        for images, _ in dataloader:
+            images = images.view(images.size(0), -1).to(device)
+
+            pred = model(images)
+            loss = loss_fn(pred, images)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+        print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
+    return model
+
+
+def train_ae(d: int, n: int):
+    model = AutoEncoder(d, n).to(device)
+    loss_function = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    return train_loop(train_dataloader, model, optimizer, loss_function)
 
 #######################################################################################################################################
 #Utility/Caller functions to generate statistics on the reconstruction error
@@ -346,4 +415,4 @@ def run_simulation():
      plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
 
 if __name__ == "__main__":
-    run_simulation()
+    train_ae(448, 784)
