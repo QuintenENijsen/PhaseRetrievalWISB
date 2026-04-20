@@ -320,7 +320,7 @@ class AutoEncoder(nn.Module):
 
 #Training parameters
 learning_rate = 1e-3
-epochs = 700
+epochs = 100
 
 def train_loop(dataloader, model, optimizer, loss_fn):
     for epoch in range(epochs):
