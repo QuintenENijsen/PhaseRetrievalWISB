@@ -50,7 +50,7 @@ def generate_measurement_gpu(A, f_0):
 # Data loading
 #######################################################################################################################################
 
-training_size = 8000
+training_size = 15000
 validation_size = 10
 
 training_dataset = datasets.MNIST(
@@ -239,12 +239,30 @@ def z_step_pca(mu, U, z, f, lambda_, lr):
 
     return z.detach().requires_grad_(True)
 
+#Formulation: g(f) + \norm{G(z) - f}_2^2.
+def update_formulation1(f, z, A, y, alpha_fs, lambda_, mu, U, stepsize, z_lr):
+    grad_f_torch = poisson_wirtinger_grad(A, f, y, alpha_fs) + 2 * lambda_ * (f - G_pca(mu, U, z))
+
+    f = f - stepsize * grad_f_torch
+    z = z_step_pca(mu, U, z, f, lambda_, z_lr)
+
+    return f, z
+
+#Formulation: g circ G(z)
+def update_formulation2(f, z, A, y, alpha_fs, mu, U, z_lr):
+    f = (mu + (U @ z.detach().unsqueeze(-1)).squeeze(-1))
+    grad_f = poisson_wirtinger_grad(A, f, y, alpha_fs)
+    grad_z = grad_f @ U
+
+    z = z - z_lr * grad_z
+    return f, z
+
 def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
     #model = G_Model(d,n).to(device)
     #freeze_model(model)
-    lambda_ = 1 #math.sqrt(n)
-    stepsize = 0.2 / (lambda_ * m)
-    z_lr = 0.1 / lambda_
+    lambda_ = 0.1 #math.sqrt(n)
+    stepsize = 0.2 / (max(lambda_,1) * m)
+    z_lr = 0.1 / (max(lambda_, 1) * m)
 
     f = torch.randn(validation_batch_size, n, requires_grad=False, device=device)
         #torch.from_numpy(new_trunc_spectral_init(A, y, n, m, alpha_fs, True)).to(device)
@@ -253,12 +271,9 @@ def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
     for _ in range(0, MAX_ITER):
         #We first do one iteration of optimzation for f, with fixed z.
         #For this we use Truncated wirtinger flow.
-        grad_f_torch = poisson_wirtinger_grad(A, f, y, alpha_fs) + 2 * lambda_ * (f - G_pca(mu, U, z))
-
-        f = f - stepsize * grad_f_torch
-        z = z_step_pca(mu, U, z, f, lambda_, z_lr)
-
-    return f
+        f ,z = update_formulation2(f, z, A, y, alpha_fs, mu, U, z_lr)
+    z = mu + (U @ z.detach().unsqueeze(-1)).squeeze(-1)
+    return z
 
 #######################################################################################################################################
 #Utility/Caller functions to generate statistics on the reconstruction error
@@ -273,7 +288,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
     mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
-    m = oversampling * n
+    m = int(oversampling * n)
 
     images, _ = next(iter(test_dataloader))
     images = images.view(images.size(0), -1)
@@ -282,13 +297,14 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
     errors = []
 
     for gt in ground_truths:
+        #print(torch.norm(gt))
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
         estimators = optimize_model_pca(d, n, m, A, y, mu, U)
-
+        #print(gt)
+        #print(estimators)
         del A,y
-
         errs = (torch_recon_error(estimators, gt.unsqueeze(0)) / torch.norm(gt)).tolist()
         errors.extend(errs)
 
@@ -299,11 +315,11 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [ 28, 56, 112, 224, 448, 672]
+     neural_net_dim = [112, 224, 336, 448, 560, 672, 768]
      X_train = flatten_data(train_dataloader).to(device)
      components, mu = compute_pca(X_train, 768)
      models = [(components[:d], mu) for d in neural_net_dim]
-     oversampling = [4, 6, 8, 10, 12, 14]
+     oversampling = [0.5, 1, 1.5, 2, 3, 4, 6]
 
      "Starting reconstruction"
 
