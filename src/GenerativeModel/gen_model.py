@@ -280,7 +280,7 @@ def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
     return z
 
 #######################################################################################################################################
-#Definition and training of a deep neural network implementation
+#Definition and training of an autoencoder implementation
 #######################################################################################################################################
 
 class AutoEncoder(nn.Module):
@@ -318,6 +318,9 @@ class AutoEncoder(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
+def decode_ae(model, z):
+    return model.decoder(z.detach().unsqueeze(-1)).squeeze(-1)
+
 #Training parameters
 learning_rate = 1e-3
 epochs = 100
@@ -343,6 +346,31 @@ def train_ae(d: int, n: int):
     loss_function = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     return train_loop(train_dataloader, model, optimizer, loss_function)
+
+#######################################################################################################################################
+# Reconstruction under the autoencoder regime.
+#######################################################################################################################################
+
+def update_rule_ae(z, A, y, alpha_fs, model, z_lr):
+    f = decode_ae(model, z)
+
+    grad_f = poisson_wirtinger_grad(A, f, y, alpha_fs)
+    something = 0 #This should be the jacobian of G.
+    grad_z = grad_f * 0
+
+    z = z - z_lr * grad_z
+    return z
+
+def optimize_model_ae(d: int, n: int, m: int, A, y, model):
+    freeze_model(model)
+    z_lr = 0.1 / m
+
+    z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
+
+    for _ in range(MAX_ITER):
+        z = update_rule_ae(z, A, y, alpha_fs, model, z_lr)
+
+    return model(z)
 
 #######################################################################################################################################
 #Utility/Caller functions to generate statistics on the reconstruction error
@@ -415,4 +443,5 @@ def run_simulation():
      plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
 
 if __name__ == "__main__":
-    train_ae(448, 784)
+    run_simulation()
+#train_ae(448, 784)

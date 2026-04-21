@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Added training for an autoencoder.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Small parameter change.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -336,14 +337,21 @@
       <option name="project" value="LOCAL" />
       <updated>1776710533721</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Small parameter change.">
+      <option name="closed" value="true" />
+      <created>1776710568276</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1776710568276</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Model werkt, goofy aah resultaten tho." />
     <MESSAGE value="Laatste veranderingen toegevoegd." />
     <MESSAGE value="extra plaatjes genereerd, plus verschillende energie levels." />
     <MESSAGE value="Paralellized the code more." />
@@ -368,6 +376,7 @@
     <MESSAGE value="nog wat gerund." />
     <MESSAGE value="Zieke plaatjes + nieuwe estimator." />
     <MESSAGE value="Added training for an autoencoder." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added training for an autoencoder." />
+    <MESSAGE value="Small parameter change." />
+    <option name="LAST_COMMIT_MESSAGE" value="Small parameter change." />
   </component>
 </project>
