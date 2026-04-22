@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Small parameter change.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

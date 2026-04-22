@@ -29,7 +29,7 @@ alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
 
-validation_batch_size = 20
+validation_batch_size = 50
 
 #######################################################################################################################################
 #Small utility functions and initialization
@@ -74,7 +74,7 @@ test_indices = torch.randperm(len(test_dataset))[:validation_size]
 test_data = Subset(test_dataset, test_indices)
 
 train_dataloader = DataLoader(training_data,
-                              batch_size=128,
+                              batch_size=512,
                               num_workers=6,
                               pin_memory=True,
                               persistent_workers=True,
@@ -293,24 +293,24 @@ class AutoEncoder(nn.Module):
         hidden3 = n - 3 * step
 
         self.encoder = nn.Sequential(
-            nn.Linear(n, hidden1),
+            nn.Linear(n, hidden2),
             nn.ReLU(),
-            nn.Linear(hidden1, hidden2),
-            nn.ReLU(),
-            nn.Linear(hidden2, hidden3),
-            nn.ReLU(),
-            nn.Linear(hidden3, d),
+            #nn.Linear(hidden1, hidden2),
+            #nn.ReLU(),
+            #nn.Linear(hidden2, hidden3),
+            #nn.ReLU(),
+            nn.Linear(hidden2, d),
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(d, hidden3),
+            nn.Linear(d, hidden2),
             nn.ReLU(),
-            nn.Linear(hidden3, hidden2),
-            nn.ReLU(),
-            nn.Linear(hidden2, hidden1),
-            nn.ReLU(),
-            nn.Linear(hidden1, n),
-            nn.Softplus(),
+            #nn.Linear(hidden3, hidden2),
+            #nn.ReLU(),
+            #nn.Linear(hidden2, hidden1),
+            #nn.ReLU(),
+            nn.Linear(hidden2, n),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -319,11 +319,11 @@ class AutoEncoder(nn.Module):
         return decoded
 
 def decode_ae(model, z):
-    return model.decoder(z.detach().unsqueeze(-1)).squeeze(-1)
+    return model.decoder(z.detach())
 
 #Training parameters
 learning_rate = 1e-3
-epochs = 100
+epochs = 60
 
 def train_loop(dataloader, model, optimizer, loss_fn):
     for epoch in range(epochs):
@@ -351,14 +351,16 @@ def train_ae(d: int, n: int):
 # Reconstruction under the autoencoder regime.
 #######################################################################################################################################
 
-def update_rule_ae(z, A, y, alpha_fs, model, z_lr):
-    f = decode_ae(model, z)
-
+def update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr):
+    optimizer.zero_grad()
+    with torch.no_grad():
+        f = model.decoder(z)
     grad_f = poisson_wirtinger_grad(A, f, y, alpha_fs)
-    something = 0 #This should be the jacobian of G.
-    grad_z = grad_f * 0
 
-    z = z - z_lr * grad_z
+    f2 = model.decoder(z)
+    f2.backward(grad_f.detach())
+    optimizer.step()
+
     return z
 
 def optimize_model_ae(d: int, n: int, m: int, A, y, model):
@@ -366,11 +368,12 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
     z_lr = 0.1 / m
 
     z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
-
+    optimizer = torch.optim.Adam([z], lr=1e-2)
     for _ in range(MAX_ITER):
-        z = update_rule_ae(z, A, y, alpha_fs, model, z_lr)
+        z = update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr)
 
-    return model(z)
+    with torch.no_grad():
+        return model.decoder(z)
 
 #######################################################################################################################################
 #Utility/Caller functions to generate statistics on the reconstruction error
@@ -379,10 +382,11 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    components, mu = inputs[0][1]
+    model = inputs[0][1].to(device=device, dtype=torch.float32)
+    #components, mu = inputs[0][1]
 
-    U = components.T.to(device=device, dtype=torch.float32)
-    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    #U = components.T.to(device=device, dtype=torch.float32)
+    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
     m = int(oversampling * n)
@@ -398,7 +402,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
+        estimators = optimize_model_ae(d, n, m, A, y, model)
         #print(gt)
         #print(estimators)
         del A,y
@@ -412,10 +416,11 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [112, 224, 336, 448, 560, 672, 768]
-     X_train = flatten_data(train_dataloader).to(device)
-     components, mu = compute_pca(X_train, 768)
-     models = [(components[:d], mu) for d in neural_net_dim]
+     neural_net_dim =  [112, 224, 336, 448, 560, 672, 784]
+     #X_train = flatten_data(train_dataloader).to(device)
+     #components, mu = compute_pca(X_train, 784)
+     #models = [(components[:d], mu) for d in neural_net_dim]
+     models = [train_ae(d, 784) for d in neural_net_dim]
      oversampling = [0.5, 1, 1.5, 2, 3, 4, 6]
 
      "Starting reconstruction"
