@@ -382,14 +382,14 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    model = inputs[0][1].to(device=device, dtype=torch.float32)
-    #components, mu = inputs[0][1]
+    #model = inputs[0][1].to(device=device, dtype=torch.float32)
+    components, mu = inputs[0][1]
 
-    #U = components.T.to(device=device, dtype=torch.float32)
-    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    U = components.T.to(device=device, dtype=torch.float32)
+    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
-    m = int(oversampling * n)
+    m = int(oversampling * d)
 
     images, _ = next(iter(test_dataloader))
     images = images.view(images.size(0), -1)
@@ -402,7 +402,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_ae(d, n, m, A, y, model)
+        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
         #print(gt)
         #print(estimators)
         del A,y
@@ -417,11 +417,11 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 def run_simulation():
      neural_net_dim =  [112, 224, 336, 448, 560, 672, 784]
-     #X_train = flatten_data(train_dataloader).to(device)
-     #components, mu = compute_pca(X_train, 784)
-     #models = [(components[:d], mu) for d in neural_net_dim]
-     models = [train_ae(d, 784) for d in neural_net_dim]
-     oversampling = [0.5, 1, 1.5, 2, 3, 4, 6]
+     X_train = flatten_data(train_dataloader).to(device)
+     components, mu = compute_pca(X_train, 784)
+     models = [(components[:d], mu) for d in neural_net_dim]
+     #models = [train_ae(d, 784) for d in neural_net_dim]
+     oversampling = [1, 2, 3, 4, 5, 6, 8, 10]
 
      "Starting reconstruction"
 
