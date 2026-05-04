@@ -74,7 +74,7 @@ def spectral_initialization(y: npt.NDArray[np.float64], A: npt.NDArray[np.float6
     eigenvalues, eigenvectors = la.eigh(Y)
     max_index = np.argmax(eigenvalues)
 
-    new_norm = math.sqrt(n * np.sum(y.astype(np.float64)) / np.sum(np.linalg.norm(A, axis=1)))
+    new_norm = math.sqrt(n * np.sum(y.astype(np.float64)) / np.sum(np.sqrt(np.sum(A ** 2, axis=1))))
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
     return (new_norm / math.sqrt(np.dot(max_eigenvector, max_eigenvector))) * max_eigenvector
@@ -161,8 +161,8 @@ def compute_for_nm(n_m, norm_f0):
     return n, m_ratio, avg_error, avg_maxrange
 
 def run_average_sim():
-    ns = [5, 7, 10, 12, 15, 17, 20, 22, 25, 27]# 45, 50]
-    oversampling_ratios = [20 * n for n in ns]  # your ms list
+    ns = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]# 45, 50]
+    oversampling_ratios = [2 * n**2 for n in ns]  # your ms list
 
     jobs = list(product(ns, oversampling_ratios))
 
