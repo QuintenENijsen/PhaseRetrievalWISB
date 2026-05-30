@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Autoencoders werkend, maar reconstructie nog niet goed.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Kleine aanpassingen real_wirtinger_flow">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_wirtinger_flow.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/real_wirtinger_flow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -354,14 +354,21 @@
       <option name="project" value="LOCAL" />
       <updated>1776885037729</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="Kleine aanpassingen real_wirtinger_flow">
+      <option name="closed" value="true" />
+      <created>1777924323792</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1777924323792</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="extra plaatjes genereerd, plus verschillende energie levels." />
     <MESSAGE value="Paralellized the code more." />
     <MESSAGE value="Added numba, got heatmap for n=5-20." />
     <MESSAGE value="Small fix to get correct initialization." />
@@ -386,6 +393,7 @@
     <MESSAGE value="Added training for an autoencoder." />
     <MESSAGE value="Small parameter change." />
     <MESSAGE value="Autoencoders werkend, maar reconstructie nog niet goed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Autoencoders werkend, maar reconstructie nog niet goed." />
+    <MESSAGE value="Kleine aanpassingen real_wirtinger_flow" />
+    <option name="LAST_COMMIT_MESSAGE" value="Kleine aanpassingen real_wirtinger_flow" />
   </component>
 </project>

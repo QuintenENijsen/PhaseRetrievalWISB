@@ -7,10 +7,10 @@ import numpy as np
 from numpy import linalg as la
 import numpy.typing as npt
 import math
-from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncrate
+from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncrate, plot_heat_map
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
-#from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
+from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
 
 import cProfile
 import pstats
@@ -100,7 +100,7 @@ def counting_trunc_spectral_init(y: npt.NDArray[np.float64], n: int, m: int) -> 
     return truncated_count, non_zero_count
 
 def gradient_descent(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int):
-    f = trunc_spectral_init(A, y, n, m, False)
+    f = trunc_spectral_init(A, y, n, m, 3, False)
     mu = 0.2  #Chosen based on the paper stating that we should have 0 < mu < 0.28.
     minimizer =  truncGradientDescent(f, y, A, mu, MAX_ITER, eps, alpha_f_lb, alpha_f_ub, alpha_y)
     return minimizer
@@ -190,34 +190,33 @@ def calc_init_error(norm_alphas):
     :param alpha_fs: The truncation parameter used during the spectral initialization
     :return: The average error over 50 measurements of the truncated spectral initialization
     '''
-    n = 24
-    norm = norm_alphas[0]
+    n = norm_alphas[0]
+    norm = 10
     oversampling = norm_alphas[1]
-    m = oversampling * n
+    m = int(oversampling * n)
 
     ground_truth = generate_gaussian_vector(n) * norm
     measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,100)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
-    inits = [new_trunc_spectral_init(A, y, n, m, 3, False) for A, y in zip(measurement_maps, measurements)]
+    inits = [gradient_descent(A, y, n, m) for A, y in zip(measurement_maps, measurements)]
     errors = list(map(lambda init: calculate_reconstruction_error(init, ground_truth), inits))
 
     print(str(norm_alphas) + " , Completed")
     average = sum(errors) / len(errors)
-    return norm, oversampling, average / norm
+    return n, oversampling, average / norm
 
 def find_init_error():
-    norms = [8e-2, 9e-2, 1e-1, 2e-1, 3e-1, 4e-1, 5e-1, 6e-1, 7e-1, 8e-1, 9e-1, 1]#, 2, 3, 5, 7, 10, 20, 50, 100]
-    alpha_fs = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
-    jobs = list(product(norms, alpha_fs))
+    dims = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60]
+    oversampling = [1, 2, 3, 4, 5, 6]
+    jobs = list(product(dims, oversampling))
 
     with ProcessPoolExecutor() as executor:
         all_results = list(executor.map(calc_init_error, jobs))
 
     print(all_results)
 
-    count_across_norm = {n: [] for n in norms}
+    count_across_norm = {n: [] for n in dims}
 
     for norm, alpha_f, rate in all_results:
         count_across_norm[norm].append(rate)
@@ -225,11 +224,11 @@ def find_init_error():
     rate_lookup = {(norm, alpha_f): error for norm, alpha_f, error in all_results}
 
     error_matrix = np.array([
-        [rate_lookup[(n, m)] for m in alpha_fs]
-        for n in norms
+        [rate_lookup[(n, m)] for m in oversampling]
+        for n in dims
     ])
 
-    plot_heat_map_norm(norms, alpha_fs, error_matrix, 1)
+    plot_heat_map(dims, oversampling, error_matrix, 1)
 
 #profiler = cProfile.Profile()
 #profiler.enable()
