@@ -16,7 +16,7 @@ import cProfile
 import pstats
 
 eps = 1e-30
-MAX_ITER = 15_000
+MAX_ITER = 2000
 norm_f0 = 100
 
 #Fake values
@@ -196,7 +196,7 @@ def calc_init_error(norm_alphas):
     m = int(oversampling * n)
 
     ground_truth = generate_gaussian_vector(n) * norm
-    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,100)]
+    measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
     inits = [gradient_descent(A, y, n, m) for A, y in zip(measurement_maps, measurements)]
@@ -207,7 +207,7 @@ def calc_init_error(norm_alphas):
     return n, oversampling, average / norm
 
 def find_init_error():
-    dims = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60]
+    dims = [112, 224, 336, 448, 560, 672, 784]
     oversampling = [1, 2, 3, 4, 5, 6]
     jobs = list(product(dims, oversampling))
 

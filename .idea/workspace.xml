@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Kleine aanpassingen real_wirtinger_flow">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Wirtinger flow werkt weer">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -362,14 +363,21 @@
       <option name="project" value="LOCAL" />
       <updated>1777924323792</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Wirtinger flow werkt weer">
+      <option name="closed" value="true" />
+      <created>1780152128378</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1780152128378</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Paralellized the code more." />
     <MESSAGE value="Added numba, got heatmap for n=5-20." />
     <MESSAGE value="Small fix to get correct initialization." />
     <MESSAGE value="Structuur codebase aangepast om beter om te gaan met de meerdere modules." />
@@ -394,6 +402,7 @@
     <MESSAGE value="Small parameter change." />
     <MESSAGE value="Autoencoders werkend, maar reconstructie nog niet goed." />
     <MESSAGE value="Kleine aanpassingen real_wirtinger_flow" />
-    <option name="LAST_COMMIT_MESSAGE" value="Kleine aanpassingen real_wirtinger_flow" />
+    <MESSAGE value="Wirtinger flow werkt weer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Wirtinger flow werkt weer" />
   </component>
 </project>

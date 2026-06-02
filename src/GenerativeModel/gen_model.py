@@ -368,7 +368,7 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
     z_lr = 0.1 / m
 
     z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
-    optimizer = torch.optim.Adam([z], lr=1e-2)
+    optimizer = torch.optim.Adam([z], z_lr)
     for _ in range(MAX_ITER):
         z = update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr)
 
@@ -416,10 +416,12 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim =  [112, 224, 336, 448, 560, 672, 784]
+     neural_net_dim = [784]  # [112, 224, 336, 448, 560, 672, 784]
      X_train = flatten_data(train_dataloader).to(device)
-     components, mu = compute_pca(X_train, 784)
-     models = [(components[:d], mu) for d in neural_net_dim]
+     #components, mu = compute_pca(X_train, 784)
+     #models = [(components[:d], mu) for d in neural_net_dim]
+     #components = [torch.eye(784, device=device)]
+     models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
      #models = [train_ae(d, 784) for d in neural_net_dim]
      oversampling = [1, 2, 3, 4, 5, 6, 8, 10]
 
