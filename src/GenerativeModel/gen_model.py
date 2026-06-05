@@ -286,31 +286,35 @@ def optimize_model_pca(d: int, n: int, m: int, A, y, mu, U):
 class AutoEncoder(nn.Module):
     def __init__(self, d, n):
         super(AutoEncoder, self).__init__()
-        self.flatten = nn.Flatten()
-        step = (n-d) // 4
-        hidden1 = n - step
-        hidden2 = n - 2 * step
-        hidden3 = n - 3 * step
+        self.n = n  # 784 = 28×28
 
         self.encoder = nn.Sequential(
-            nn.Linear(n, hidden2),
+            nn.Conv2d(1, 16, 3, stride=2, padding=1),
+            # 16×14×14
             nn.ReLU(),
-            #nn.Linear(hidden1, hidden2),
-            #nn.ReLU(),
-            #nn.Linear(hidden2, hidden3),
-            #nn.ReLU(),
-            nn.Linear(hidden2, d),
+            nn.Conv2d(16, 32, 3, stride=2, padding=1),
+            # 32×7×7
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 3, stride=2, padding=1),
+            # 64×4×4
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(64 * 4 * 4, d),
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(d, hidden2),
+            nn.Linear(d, 64 * 4 * 4),
+            nn.Unflatten(1, (64, 4, 4)),
+            nn.ConvTranspose2d(64, 32, 3, stride=2,
+                               padding=1, output_padding=0),  # 4→7
             nn.ReLU(),
-            #nn.Linear(hidden3, hidden2),
-            #nn.ReLU(),
-            #nn.Linear(hidden2, hidden1),
-            #nn.ReLU(),
-            nn.Linear(hidden2, n),
+            nn.ConvTranspose2d(32, 16, 3, stride=2,
+                               padding=1, output_padding=1),  # 7→14
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 1, 3, stride=2,
+                               padding=1, output_padding=1),  # 14→28
             nn.Sigmoid(),
+            nn.Flatten(),
         )
 
     def forward(self, x):
@@ -322,22 +326,25 @@ def decode_ae(model, z):
     return model.decoder(z.detach())
 
 #Training parameters
-learning_rate = 1e-3
-epochs = 60
+#learning_rate = 3e-4
+epochs = 100
 
 def train_loop(dataloader, model, optimizer, loss_fn):
     for epoch in range(epochs):
+        total_loss = 0
         for images, _ in dataloader:
-            images = images.view(images.size(0), -1).to(device)
+            images = images.to(device)
 
             pred = model(images)
-            loss = loss_fn(pred, images)
+            loss = loss_fn(pred, images.view(images.size(0), -1))
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-        print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
+            total_loss += loss.item()
+
+        print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(dataloader):.6f}")
     return model
 
 
@@ -363,13 +370,16 @@ def update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr):
 
     return z
 
+
 def optimize_model_ae(d: int, n: int, m: int, A, y, model):
     freeze_model(model)
-    z_lr = 0.1 / m
+    z_lr = 1e-2
 
     z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
     optimizer = torch.optim.Adam([z], z_lr)
-    for _ in range(MAX_ITER):
+    for ix in range(MAX_ITER):
+        if ix % 10 == 0:
+            z_lr = z_lr * 0.95
         z = update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr)
 
     with torch.no_grad():
@@ -382,11 +392,11 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    #model = inputs[0][1].to(device=device, dtype=torch.float32)
-    components, mu = inputs[0][1]
+    model = inputs[0][1].to(device=device, dtype=torch.float32)
+    #components, mu = inputs[0][1]
 
-    U = components.T.to(device=device, dtype=torch.float32)
-    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    #U = components.T.to(device=device, dtype=torch.float32)
+    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
     m = int(oversampling * d)
@@ -402,7 +412,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
+        estimators = optimize_model_ae(d, n, m, A, y, model)
         #print(gt)
         #print(estimators)
         del A,y
@@ -416,14 +426,14 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [784]  # [112, 224, 336, 448, 560, 672, 784]
+     neural_net_dim = [56, 112, 168, 224, 336]
      X_train = flatten_data(train_dataloader).to(device)
      #components, mu = compute_pca(X_train, 784)
      #models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
-     models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
-     #models = [train_ae(d, 784) for d in neural_net_dim]
-     oversampling = [1, 2, 3, 4, 5, 6, 8, 10]
+     #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
+     models = [train_ae(d, 784) for d in neural_net_dim]
+     oversampling = [1, 2, 3, 4, 5, 6]
 
      "Starting reconstruction"
 

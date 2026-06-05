@@ -199,8 +199,6 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
         "axes.labelsize": 13,
         "axes.titlesize": 14,
         "figure.dpi": 300,
-        #"text.usetex": True,
-        #"font.family": "Serif",
     })
 
     color_map = cm.get_cmap("viridis_r").copy()
@@ -217,8 +215,8 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
             "extend": "max"
     })
 
-    plt.xlabel("Oversampling ratio m/d")
-    plt.ylabel("Latent dimension d")
+    plt.xlabel(r"Oversampling ratio $\frac{m}{d}$")
+    plt.ylabel(r"Latent dimension $d$")
 
     plt.tight_layout()
     plt.savefig("genmodel.png")
