@@ -9,7 +9,7 @@ from torchvision.transforms import ToTensor
 
 #Locally defined modules
 from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncatedGradient
-from src.Plotting.plotting import plot_heat_map_genmodel
+from src.Plotting.plotting import plot_heat_map_genmodel, plot_error_per_dim
 from src.ReconstructionAlgorithms.truncatedwf.real_truncated_wf import new_trunc_spectral_init
 from src.Initialization.pr_init import generate_gaussian_vector, generate_measurement_matrix, generate_measured, calculate_reconstruction_error, calculate_range
 
@@ -24,7 +24,7 @@ import os
 #GPU detection.
 device = torch.accelerator.current_accelerator().type
 
-MAX_ITER: int = 1000
+MAX_ITER: int = 5000
 alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
@@ -378,7 +378,7 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
     z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
     optimizer = torch.optim.Adam([z], z_lr)
     for ix in range(MAX_ITER):
-        if ix % 10 == 0:
+        if ix % 100 == 0:
             z_lr = z_lr * 0.95
         z = update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr)
 
@@ -392,11 +392,11 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    model = inputs[0][1].to(device=device, dtype=torch.float32)
-    #components, mu = inputs[0][1]
+    #model = inputs[0][1].to(device=device, dtype=torch.float32)
+    components, mu = inputs[0][1]
 
-    #U = components.T.to(device=device, dtype=torch.float32)
-    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    U = components.T.to(device=device, dtype=torch.float32)
+    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
     m = int(oversampling * d)
@@ -412,7 +412,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_ae(d, n, m, A, y, model)
+        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
         #print(gt)
         #print(estimators)
         del A,y
@@ -426,14 +426,14 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [56, 112, 168, 224, 336]
-     X_train = flatten_data(train_dataloader).to(device)
+     neural_net_dim = [784] #[56, 112, 168, 224, 336]
+     #X_train = flatten_data(train_dataloader).to(device)
      #components, mu = compute_pca(X_train, 784)
      #models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
-     #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
-     models = [train_ae(d, 784) for d in neural_net_dim]
-     oversampling = [1, 2, 3, 4, 5, 6]
+     models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
+     #models = [train_ae(d, 784) for d in neural_net_dim]
+     oversampling = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
      "Starting reconstruction"
 
@@ -457,7 +457,7 @@ def run_simulation():
          for n in neural_net_dim
      ])
 
-     plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
+     plot_error_per_dim(784, oversampling, error_matrix[0])
 
 if __name__ == "__main__":
     run_simulation()
