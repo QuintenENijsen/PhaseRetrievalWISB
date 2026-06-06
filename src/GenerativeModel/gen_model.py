@@ -378,7 +378,7 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
     z = torch.randn(validation_batch_size, d, requires_grad=True, device=device)
     optimizer = torch.optim.Adam([z], z_lr)
     for ix in range(MAX_ITER):
-        if ix % 100 == 0:
+        if ix % 50 == 0:
             z_lr = z_lr * 0.95
         z = update_rule_ae(z, A, y, alpha_fs, model, optimizer, z_lr)
 

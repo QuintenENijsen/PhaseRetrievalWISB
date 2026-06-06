@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Model convergeert?">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Kleine dingetjes toegevoegd.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -387,14 +385,21 @@
       <option name="project" value="LOCAL" />
       <updated>1780686771462</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Kleine dingetjes toegevoegd.">
+      <option name="closed" value="true" />
+      <created>1780768211546</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1780768211546</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Structuur codebase aangepast om beter om te gaan met de meerdere modules." />
     <MESSAGE value="Denk nog een keer goed na over de structuur, maybe C++ rewrite." />
     <MESSAGE value="Gradient descent of truncated wf in C++." />
     <MESSAGE value="Lage intensiteit gefixed." />
@@ -419,6 +424,7 @@
     <MESSAGE value="Wirtinger flow werkt weer" />
     <MESSAGE value="Mini aanpassing." />
     <MESSAGE value="Model convergeert?" />
-    <option name="LAST_COMMIT_MESSAGE" value="Model convergeert?" />
+    <MESSAGE value="Kleine dingetjes toegevoegd." />
+    <option name="LAST_COMMIT_MESSAGE" value="Kleine dingetjes toegevoegd." />
   </component>
 </project>
