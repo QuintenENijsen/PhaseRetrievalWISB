@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Goeie plaatje er nu bij gegenereerd.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="plaatjes gegeneert.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genmodel.png" beforeDir="false" afterPath="$PROJECT_DIR$/genmodel.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -403,14 +402,21 @@
       <option name="project" value="LOCAL" />
       <updated>1780770879382</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="plaatjes gegeneert.">
+      <option name="closed" value="true" />
+      <created>1780854891598</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1780854891598</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Gradient descent of truncated wf in C++." />
     <MESSAGE value="Lage intensiteit gefixed." />
     <MESSAGE value="C++ geoptimaliseerd" />
     <MESSAGE value="Added counting for the spectral init." />
@@ -435,6 +441,7 @@
     <MESSAGE value="Model convergeert?" />
     <MESSAGE value="Kleine dingetjes toegevoegd." />
     <MESSAGE value="Goeie plaatje er nu bij gegenereerd." />
-    <option name="LAST_COMMIT_MESSAGE" value="Goeie plaatje er nu bij gegenereerd." />
+    <MESSAGE value="plaatjes gegeneert." />
+    <option name="LAST_COMMIT_MESSAGE" value="plaatjes gegeneert." />
   </component>
 </project>

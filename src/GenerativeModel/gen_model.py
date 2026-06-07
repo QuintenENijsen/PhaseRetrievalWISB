@@ -24,7 +24,7 @@ import os
 #GPU detection.
 device = torch.accelerator.current_accelerator().type
 
-MAX_ITER: int = 5000
+MAX_ITER: int = 3000
 alpha_fs = 3     #Paper states >= 3
 alpha_f_lb = 0.3     #Paper states should be 0 <= alpha <= 0.5
 alpha_f_ub = 5     #Paper states that >= 5
@@ -327,7 +327,7 @@ def decode_ae(model, z):
 
 #Training parameters
 #learning_rate = 3e-4
-epochs = 100
+epochs = 70
 
 def train_loop(dataloader, model, optimizer, loss_fn):
     for epoch in range(epochs):
@@ -392,11 +392,11 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    #model = inputs[0][1].to(device=device, dtype=torch.float32)
-    components, mu = inputs[0][1]
+    model = inputs[0][1].to(device=device, dtype=torch.float32)
+    #components, mu = inputs[0][1]
 
-    U = components.T.to(device=device, dtype=torch.float32)
-    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    #U = components.T.to(device=device, dtype=torch.float32)
+    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
     m = int(oversampling * d)
@@ -412,7 +412,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
+        estimators = optimize_model_ae(d, n, m, A, y, model)
         #print(gt)
         #print(estimators)
         del A,y
@@ -426,16 +426,16 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [112, 224, 336, 448, 560, 672, 784]
-     X_train = flatten_data(train_dataloader).to(device)
-     components, mu = compute_pca(X_train, 784)
-     models = [(components[:d], mu) for d in neural_net_dim]
+     neural_net_dim = [ 28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
+     #X_train = flatten_data(train_dataloader).to(device)
+     #components, mu = compute_pca(X_train, 784)
+     #models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
      #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
-     #models = [train_ae(d, 784) for d in neural_net_dim]
+     models = [train_ae(d, 784) for d in neural_net_dim]
      oversampling = [1, 2, 3, 4, 5, 6, 7, 8]
 
-     "Starting reconstruction"
+     print("Starting reconstruction")
 
      jobs = list(product(zip(neural_net_dim, models), oversampling))
 
