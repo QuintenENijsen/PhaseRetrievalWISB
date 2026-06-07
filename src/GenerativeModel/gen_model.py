@@ -426,14 +426,14 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 
 def run_simulation():
-     neural_net_dim = [784] #[56, 112, 168, 224, 336]
-     #X_train = flatten_data(train_dataloader).to(device)
-     #components, mu = compute_pca(X_train, 784)
-     #models = [(components[:d], mu) for d in neural_net_dim]
+     neural_net_dim = [112, 224, 336, 448, 560, 672, 784]
+     X_train = flatten_data(train_dataloader).to(device)
+     components, mu = compute_pca(X_train, 784)
+     models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
-     models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
+     #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
      #models = [train_ae(d, 784) for d in neural_net_dim]
-     oversampling = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+     oversampling = [1, 2, 3, 4, 5, 6, 7, 8]
 
      "Starting reconstruction"
 
@@ -457,7 +457,7 @@ def run_simulation():
          for n in neural_net_dim
      ])
 
-     plot_error_per_dim(784, oversampling, error_matrix[0])
+     plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
 
 if __name__ == "__main__":
     run_simulation()
