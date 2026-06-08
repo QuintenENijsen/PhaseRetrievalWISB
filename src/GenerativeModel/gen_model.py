@@ -7,6 +7,9 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 #Locally defined modules
 from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncatedGradient
 from src.Plotting.plotting import plot_heat_map_genmodel, plot_error_per_dim
@@ -392,11 +395,11 @@ def optimize_model_ae(d: int, n: int, m: int, A, y, model):
 def calc_reconstruction_error(inputs) -> (int, int, float):
     n = 784
     d = inputs[0][0]
-    model = inputs[0][1].to(device=device, dtype=torch.float32)
-    #components, mu = inputs[0][1]
+    #model = inputs[0][1].to(device=device, dtype=torch.float32)
+    components, mu = inputs[0][1]
 
-    #U = components.T.to(device=device, dtype=torch.float32)
-    #mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
+    U = components.T.to(device=device, dtype=torch.float32)
+    mu = mu.squeeze(0).to(device=device, dtype=torch.float32)
 
     oversampling = inputs[1]
     m = int(oversampling * d)
@@ -412,7 +415,7 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         A = generate_measurement_matrix_gpu(n, m, validation_batch_size)
         y = generate_measurement_gpu(A, gt)
 
-        estimators = optimize_model_ae(d, n, m, A, y, model)
+        estimators = optimize_model_pca(d, n, m, A, y, mu, U)
         #print(gt)
         #print(estimators)
         del A,y
@@ -427,12 +430,12 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
 
 def run_simulation():
      neural_net_dim = [ 28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
-     #X_train = flatten_data(train_dataloader).to(device)
-     #components, mu = compute_pca(X_train, 784)
-     #models = [(components[:d], mu) for d in neural_net_dim]
+     X_train = flatten_data(train_dataloader).to(device)
+     components, mu = compute_pca(X_train, 784)
+     models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
      #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
-     models = [train_ae(d, 784) for d in neural_net_dim]
+     #models = [train_ae(d, 784) for d in neural_net_dim]
      oversampling = [1, 2, 3, 4, 5, 6, 7, 8]
 
      print("Starting reconstruction")
@@ -459,6 +462,33 @@ def run_simulation():
 
      plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
 
+def show_encoding():
+    gen_model_dim = [28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
+    X_train = flatten_data(train_dataloader).to(device)
+    components, mu = compute_pca(X_train, 784)
+    #models = [(components[:d], mu) for d in gen_model_dim]
+
+    images, labels = next(iter(test_dataloader))
+    images = images.view(images.size(0), -1).to(device)
+
+    # Encode: z = (x - mu) @ V^T  ->  (batch_size, 784)
+    encodings = ((images - mu) @ components.T).cpu().numpy()
+
+    plt.figure(figsize=(14, 6))
+    sns.heatmap(encodings, cmap="RdBu_r", center=0,
+                xticklabels=False, yticklabels=labels.numpy(),
+                cbar_kws={"label": "Encoding value", "shrink": 0.8})
+
+    for d in gen_model_dim:
+        plt.axvline(x=d, color="black", linestyle="--", linewidth=0.6)
+
+    plt.xlabel("Principal component index")
+    plt.ylabel("Image (true label)")
+    plt.title("PCA encodings of MNIST test images across latent dimensions")
+    plt.tight_layout()
+    plt.savefig("pcaencoding.png")
+
+
 if __name__ == "__main__":
-    run_simulation()
+    show_encoding()
 #train_ae(448, 784)
