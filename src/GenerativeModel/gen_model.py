@@ -423,20 +423,22 @@ def calc_reconstruction_error(inputs) -> (int, int, float):
         errors.extend(errs)
 
     average = sum(errors) / len(errors)
+    deviation = sum([(x - average)**2 for x in errors]) / len(errors)
+    st_dev = math.sqrt((deviation))
 
     print(str(inputs[0][0]) +"," + str(inputs[1]) + " , Completed " + ", Average: " + str(average))
-    return d, oversampling, average
+    return d, oversampling, average, st_dev
 
 
 def run_simulation():
-     neural_net_dim = [ 28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
-     X_train = flatten_data(train_dataloader).to(device)
-     components, mu = compute_pca(X_train, 784)
-     models = [(components[:d], mu) for d in neural_net_dim]
+     neural_net_dim = [784] # [ 28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
+     #X_train = flatten_data(train_dataloader).to(device)
+     #components, mu = compute_pca(X_train, 784)
+     #models = [(components[:d], mu) for d in neural_net_dim]
      #components = [torch.eye(784, device=device)]
-     #models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
+     models = [(torch.eye(784, device=device), torch.zeros(1, 784, device=device))]
      #models = [train_ae(d, 784) for d in neural_net_dim]
-     oversampling = [1, 2, 3, 4, 5, 6, 7, 8]
+     oversampling = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
      print("Starting reconstruction")
 
@@ -449,18 +451,20 @@ def run_simulation():
      print(all_results)
 
      count_across_norm = {n: [] for n in neural_net_dim}
+     st_dev_across = []
 
-     for norm, alpha_f, rate in all_results:
+     for norm, alpha_f, rate, st_dev in all_results:
          count_across_norm[norm].append(rate)
+         st_dev_across.append(st_dev)
 
-     rate_lookup = {(norm, alpha_f): error for norm, alpha_f, error in all_results}
+     rate_lookup = {(norm, alpha_f): error for norm, alpha_f, error, st_dev in all_results}
 
      error_matrix = np.array([
          [rate_lookup[(n, m)] for m in oversampling]
          for n in neural_net_dim
      ])
 
-     plot_heat_map_genmodel(neural_net_dim, oversampling, error_matrix, 1)
+     plot_error_per_dim(784, oversampling, st_dev_across, error_matrix[0])
 
 def show_encoding():
     gen_model_dim = [28, 56, 84, 112, 224, 336, 448, 560, 672, 784]
@@ -490,5 +494,5 @@ def show_encoding():
 
 
 if __name__ == "__main__":
-    show_encoding()
+    run_simulation()
 #train_ae(448, 784)

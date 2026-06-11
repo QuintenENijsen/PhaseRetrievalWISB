@@ -222,7 +222,7 @@ def plot_heat_map_genmodel(ks, ms, error_matrix, norm_f0):
     plt.savefig("genmodel.png")
 
 
-def plot_error_per_dim(k: int, ms: list[float], errors: list[float]):
+def plot_error_per_dim(k: int, ms: list[float], st_devs: list[float], errors: list[float]):
     plt.figure(figsize=(8, 6))
 
     plt.rcParams.update({
@@ -232,11 +232,15 @@ def plot_error_per_dim(k: int, ms: list[float], errors: list[float]):
         "figure.dpi": 300,
     })
 
-    plt.plot(ms, errors, marker="o", linestyle="-", linewidth=2, markersize=6)
+    plt.errorbar(
+        ms, errors,
+        yerr=st_devs,
+        marker="o", linestyle="-", linewidth=2, markersize=6,
+        capsize=4, capthick=1.5, elinewidth=1.5,
+    )
 
     plt.xlabel(r"Oversampling ratio $\frac{m}{n}$")
     plt.ylabel("Relative reconstruction Error")
-    #plt.title(f"Reconstruction error for latent dimension d = {k}")
 
     plt.tight_layout()
     plt.savefig(f"error_dim_{k}.png")
