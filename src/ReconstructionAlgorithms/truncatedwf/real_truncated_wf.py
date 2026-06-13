@@ -7,7 +7,7 @@ import numpy as np
 from numpy import linalg as la
 import numpy.typing as npt
 import math
-from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncrate, plot_heat_map
+from src.Plotting.plotting import plot_heat_map_norm, plot_heat_map_truncate, plot_heat_map, plot_heat_map_truncate
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from src.ReconstructionAlgorithms.truncatedwf.truncatedwf import truncGradientDescent, truncCountingSpectralInit
@@ -63,6 +63,64 @@ def new_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float6
     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
 
     return max_eigenvector * np.sqrt(norm)
+
+def class_trunc_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int, alpha_fs: int):
+    y_avg = (np.sum(y.astype(np.float64))) / m
+
+    Y: npt.NDArray[np.float64] = np.zeros((n,n), dtype=np.float64)
+
+    for i in range(0, m):
+        y_i_shift = y[i] - alpha_fs**2 * y_avg
+        weight = 1 if y[i] == 0 else soft_clip(y[i], y_avg)
+        a_i = np.ascontiguousarray(A[i])
+        Y = Y + (y[i] * weight) * np.outer(a_i, a_i)
+
+    Y = Y / m
+    eigenvalues, eigenvectors = la.eigh(Y)
+    max_index = np.argmax(eigenvalues)
+
+    norm = (max((np.sum(eigenvalues) - eigenvalues[max_index]) / (n-1), 0))
+    max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
+
+    return max_eigenvector * np.sqrt(norm)
+
+# def softsign_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int, alpha_fs: int):
+#     y_avg = (np.sum(y.astype(np.float64))) / m
+#
+#     Y: npt.NDArray[np.float64] = np.zeros((n,n), dtype=np.float64)
+#
+#     for i in range(0, m):
+#         y_i_shift = y[i] - alpha_fs**2 * y_avg
+#         weight = (2 - (y_i_shift /  (1 + abs(y_i_shift)))) / 2
+#         a_i = np.ascontiguousarray(A[i])
+#         Y = Y + (y[i] * weight) * np.outer(a_i, a_i)
+#
+#     Y = Y / m
+#     eigenvalues, eigenvectors = la.eigh(Y)
+#     max_index = np.argmax(eigenvalues)
+#
+#     norm = (max((np.sum(eigenvalues) - eigenvalues[max_index]) / (n-1), 0))
+#     max_eigenvector = np.ascontiguousarray(eigenvectors[:, max_index]).reshape(n)
+#
+#     return max_eigenvector * np.sqrt(norm)
+
+def softsign_weight(y_i_shift: float) -> float:
+    return (2 - (y_i_shift / (1 + abs(y_i_shift)))) /2
+
+def logistic_weight(y_i_shift: float) -> float:
+    return 1 - (1 / (1 + math.exp(-y_i_shift)))
+
+def tanh_weight(y_i_shift: float) -> float:
+    return (1 - ((math.exp(y_i_shift) - math.exp(-y_i_shift)) / (math.exp(y_i_shift) + math.exp(-y_i_shift)))) / 2
+
+def notrunc() -> float:
+    return 1
+
+def hardTrunc(y_i_shift) -> float:
+    return 0 if y_i_shift > 0 else 1
+
+def soft_clip(y, y_avg) -> float:
+    return 1 if y < y_avg else y_avg / y
 
 def new2_trunc_spectral_init(A: npt.NDArray[np.float64], y: npt.NDArray[np.float64], n: int, m: int, alpha_fs: int, trunc:bool):
     lambda_0: float = (np.sum(y.astype(np.float64))) / m
@@ -190,8 +248,8 @@ def calc_init_error(norm_alphas):
     :param alpha_fs: The truncation parameter used during the spectral initialization
     :return: The average error over 50 measurements of the truncated spectral initialization
     '''
-    n = norm_alphas[0]
-    norm = 10
+    n = 32
+    norm = norm_alphas[0]
     oversampling = norm_alphas[1]
     m = int(oversampling * n)
 
@@ -199,24 +257,24 @@ def calc_init_error(norm_alphas):
     measurement_maps = [generate_measurement_matrix(n, m) for _ in range(0,50)]
     measurements = [generate_measured(M, ground_truth, m) for M in measurement_maps]
 
-    inits = [gradient_descent(A, y, n, m) for A, y in zip(measurement_maps, measurements)]
+    inits = [class_trunc_init(A, y, n, m, alpha_y) for A, y in zip(measurement_maps, measurements)]
     errors = list(map(lambda init: calculate_reconstruction_error(init, ground_truth), inits))
 
     print(str(norm_alphas) + " , Completed")
     average = sum(errors) / len(errors)
-    return n, oversampling, average / norm
+    return norm, oversampling, average / norm
 
 def find_init_error():
-    dims = [112, 224, 336, 448, 560, 672, 784]
-    oversampling = [1, 2, 3, 4, 5, 6]
-    jobs = list(product(dims, oversampling))
+    norms = [0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    oversampling = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    jobs = list(product(norms, oversampling))
 
     with ProcessPoolExecutor() as executor:
         all_results = list(executor.map(calc_init_error, jobs))
 
     print(all_results)
 
-    count_across_norm = {n: [] for n in dims}
+    count_across_norm = {n: [] for n in norms}
 
     for norm, alpha_f, rate in all_results:
         count_across_norm[norm].append(rate)
@@ -225,10 +283,10 @@ def find_init_error():
 
     error_matrix = np.array([
         [rate_lookup[(n, m)] for m in oversampling]
-        for n in dims
+        for n in norms
     ])
 
-    plot_heat_map(dims, oversampling, error_matrix, 1)
+    plot_heat_map_truncate(norms, oversampling, error_matrix)
 
 #profiler = cProfile.Profile()
 #profiler.enable()

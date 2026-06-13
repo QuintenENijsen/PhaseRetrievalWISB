@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="Nog wat plaatjes gemaakt.">
+    <list default="true" id="e439e502-eed4-4ab7-ab23-44480a06fbda" name="Changes" comment="standard deviation plaatje.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GenerativeModel/gen_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Plotting/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Plotting/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ReconstructionAlgorithms/truncatedwf/real_truncated_wf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -418,14 +418,21 @@
       <option name="project" value="LOCAL" />
       <updated>1780947618838</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="standard deviation plaatje.">
+      <option name="closed" value="true" />
+      <created>1781205872046</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1781205872046</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="C++ geoptimaliseerd" />
     <MESSAGE value="Added counting for the spectral init." />
     <MESSAGE value="kleine dingetjes" />
     <MESSAGE value="idk" />
@@ -450,6 +457,7 @@
     <MESSAGE value="Goeie plaatje er nu bij gegenereerd." />
     <MESSAGE value="plaatjes gegeneert." />
     <MESSAGE value="Nog wat plaatjes gemaakt." />
-    <option name="LAST_COMMIT_MESSAGE" value="Nog wat plaatjes gemaakt." />
+    <MESSAGE value="standard deviation plaatje." />
+    <option name="LAST_COMMIT_MESSAGE" value="standard deviation plaatje." />
   </component>
 </project>

@@ -72,7 +72,7 @@ def plot_heat_map_norm(norms, ms, error_matrix, norm_f0):
     plt.tight_layout()
     plt.show()
 
-def plot_heat_map_truncrate(norms, alpha_fs, error_matrix):
+def plot_heat_map_truncate(norms, alpha_fs, error_matrix):
     df = pd.DataFrame(error_matrix, index=norms, columns=alpha_fs)
     #Flips axis
     df = df.iloc[::-1]
@@ -83,8 +83,6 @@ def plot_heat_map_truncrate(norms, alpha_fs, error_matrix):
         "axes.labelsize": 13,
         "axes.titlesize": 14,
         "figure.dpi": 300,
-        "text.usetex": True,
-        "font.family": "Serif",
     })
 
     color_map = cm.get_cmap("viridis_r").copy()
@@ -98,13 +96,14 @@ def plot_heat_map_truncrate(norms, alpha_fs, error_matrix):
         vmax=1,
         cbar_kws={
             "label": r"truncation rate",
+            "extend": r"max"
     })
 
-    plt.xlabel(r"$\alpha_f$")
+    plt.xlabel(r"Oversampling ratio $\frac{m}{n}$")
     plt.ylabel(r"Signal intensity ($|f_0|$)")
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig('spectralTrunc.png')
 
 def plot_errors(errors: list[float]):
     plt.hist(errors, bins=200)
